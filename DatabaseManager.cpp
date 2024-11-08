@@ -51,7 +51,27 @@ DatabaseManager::DatabaseManager(const char *local_db_ip, const char *local_db_p
 }
 
 DatabaseManager::~DatabaseManager() {
-    std::cout << "INFO : DatabaseManager - DESTRUCTOR" << std::endl;
+    std::cout << "INFO : DatabaseManager - DESTRUCTOR - Closing database connections" << std::endl;
+
+    if (_client_local) {
+        try {
+            _client_local.reset(); // Zwalnia zasoby związane z połączeniem lokalnym
+            std::cout << "INFO : DatabaseManager - LOCAL DATABASE CONNECTION CLOSED" << std::endl;
+        } catch (const std::exception& e) {
+            std::cerr << "ERROR : DatabaseManager - Failed to close local database connection: " << e.what() << std::endl;
+        }
+    }
+
+    if (_client_remote) {
+        try {
+            _client_remote.reset(); // Zwalnia zasoby związane z połączeniem zdalnym
+            std::cout << "INFO : DatabaseManager - REMOTE DATABASE CONNECTION CLOSED" << std::endl;
+        } catch (const std::exception& e) {
+            std::cerr << "ERROR : DatabaseManager - Failed to close remote database connection: " << e.what() << std::endl;
+        }
+    }
+
+    std::cout << "INFO : DatabaseManager - DESTRUCTOR COMPLETED" << std::endl;
 }
 
 std::unique_ptr<mongocxx::client> DatabaseManager::connect(const char *db_ip, const char *db_port, const char *db_password, const mongocxx::options::client &options) {
