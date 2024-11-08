@@ -25,6 +25,10 @@ public:
         return _instance != nullptr;
     }
 
+    static DatabaseManager* getInstance() {
+        return _instance.get();
+    }
+
 private:
     static std::unique_ptr<DatabaseManager> _instance;
     static std::unique_ptr<mongocxx::client> _client_local;
