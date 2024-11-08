@@ -1,3 +1,4 @@
+#include <csignal>
 #include <iostream>
 
 #include "Validations/DataValidations.h"
@@ -6,9 +7,17 @@
 
 #define REQUESTED_ARGUMENTS 8
 
+volatile bool run = true;
+
+void signalHandler(int signum) {
+    run = false;
+}
+
 int main(int argc, const char * argv[])
 {
     std::cout << "INFO : RobotControlCenterBackend - START" << std::endl;
+
+    std::signal(SIGTERM, signalHandler);
 
     if(argc != REQUESTED_ARGUMENTS) {
         std::cerr << "ERROR : Wrong number of arguments" << std::endl;
@@ -23,6 +32,10 @@ int main(int argc, const char * argv[])
     } else {
         std::cerr << "ERROR : Invalid arguments provided.\n";
         return 1;
+    }
+
+    while(run) {
+        sleep(2);
     }
 
     std::cout << "INFO : RobotControlCenterBackend - END" << std::endl;
