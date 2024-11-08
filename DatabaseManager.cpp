@@ -20,6 +20,7 @@ std::unique_ptr<mongocxx::client> DatabaseManager::_client_remote = nullptr;
 
 DatabaseManager::DatabaseManager(const char *local_db_ip, const char *local_db_port, const char *remote_db_ip,
     const char *remote_db_port, const char *db_password) {
+    mongocxx::instance instance{};
 
     auto options = createClientOptions();
 
