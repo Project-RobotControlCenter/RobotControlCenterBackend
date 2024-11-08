@@ -8,6 +8,7 @@
 #include <memory>
 #include <mongocxx/client.hpp>
 
+
 class DatabaseManager {
 public:
     DatabaseManager(const DatabaseManager&) = delete;
@@ -34,6 +35,7 @@ private:
     DatabaseManager(const char * local_db_ip, const char * local_db_port, const char * remote_db_ip, const char * remote_db_port, const char * db_password);
 
     std::unique_ptr<mongocxx::client> connect(const char * db_ip, const char * db_port, const char * db_password);
+    bool isConnected(const std::unique_ptr<mongocxx::client>& client);
 };
 
 

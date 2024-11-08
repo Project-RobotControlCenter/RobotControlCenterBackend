@@ -5,6 +5,15 @@
 #include "DatabaseManager.h"
 
 #include <iostream>
+#include <bsoncxx/builder/stream/document.hpp>
+#include <mongocxx/exception/exception.hpp>
+#include <mongocxx/client.hpp>
+#include <mongocxx/instance.hpp>
+#include <bsoncxx/json.hpp>
+
+std::unique_ptr<DatabaseManager> DatabaseManager::_instance = nullptr;
+std::unique_ptr<mongocxx::client> DatabaseManager::_client_local = nullptr;
+std::unique_ptr<mongocxx::client> DatabaseManager::_client_remote = nullptr;
 
 DatabaseManager::DatabaseManager(const char *local_db_ip, const char *local_db_port, const char *remote_db_ip,
     const char *remote_db_port, const char *db_password) {
@@ -43,3 +52,36 @@ std::unique_ptr<mongocxx::client> DatabaseManager::connect(const char *db_ip, co
         return nullptr;
     };
 }
+
+bool DatabaseManager::isConnected(const std::unique_ptr<mongocxx::client> &client) {
+    if (!client) {
+        std::cerr << "Error: Client pointer is null." << std::endl;
+        return false;
+    }
+
+    try {
+        auto admin_db = client->database("admin");
+        bsoncxx::builder::stream::document command;
+        command << "ping" << 1;
+
+        auto result = admin_db.run_command(command.view());
+        auto ok_element = result.view()["ok"];
+
+        if (ok_element && ok_element.type() == bsoncxx::type::k_double) {
+            return ok_element.get_double() == 1.0;
+        } else {
+            std::cerr << "Error: Unexpected response type or missing 'ok' field." << std::endl;
+            return false;
+        }
+    } catch (const mongocxx::exception& e) {
+        std::cerr << "Error : MongoDB exception: " << e.what() << std::endl;
+        return false;
+    } catch (const std::exception& e) {
+        std::cerr << "Error : Standard exception: " << e.what() << std::endl;
+        return false;
+    } catch (...) {
+        std::cerr << "Error : Unknown error occurred while checking connection." << std::endl;
+        return false;
+    }
+}
+
