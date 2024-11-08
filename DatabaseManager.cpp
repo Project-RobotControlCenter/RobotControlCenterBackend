@@ -136,6 +136,16 @@ mongocxx::options::client DatabaseManager::createClientOptions() {
         std::string failed_host = std::string(event.host()) + ":" + std::to_string(event.port());
         std::cerr << "ERROR : DatabaseManager - HEARTBEAT FAILED for :" << failed_host << std::endl;
 
+        if(failed_host == (_local_db_ip+ ":" + _local_db_port)) {
+            _client_local.reset();
+            _client_local = nullptr;
+        }
+
+        if(failed_host == (_remote_db_ip+ ":" + _remote_db_port)) {
+            _client_remote.reset();
+            _client_remote = nullptr;
+        }
+
         volatile int reconnect_attempts = 0;
 
         while(reconnect_attempts < MAX_RECONNECT_ATTEMPTS) {
