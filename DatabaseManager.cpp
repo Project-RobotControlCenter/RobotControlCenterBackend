@@ -5,6 +5,7 @@
 #include "DatabaseManager.h"
 
 #include <iostream>
+#include <thread>
 #include <bsoncxx/builder/stream/document.hpp>
 #include <mongocxx/exception/exception.hpp>
 #include <mongocxx/client.hpp>
@@ -14,18 +15,22 @@
 #include <mongocxx/options/client.hpp>
 #include <mongocxx/options/apm.hpp>
 
+
+
 std::unique_ptr<DatabaseManager> DatabaseManager::_instance = nullptr;
 std::unique_ptr<mongocxx::client> DatabaseManager::_client_local = nullptr;
 std::unique_ptr<mongocxx::client> DatabaseManager::_client_remote = nullptr;
 
 DatabaseManager::DatabaseManager(const char *local_db_ip, const char *local_db_port, const char *remote_db_ip,
-    const char *remote_db_port, const char *db_password) {
+    const char *remote_db_port, const char *db_password)
+        : _local_db_ip(local_db_ip), _local_db_port(local_db_port), _remote_db_ip(remote_db_ip), _remote_db_port(remote_db_port), _db_password(db_password)
+{
     mongocxx::instance instance{};
 
-    auto options = createClientOptions();
+    _options = createClientOptions();
 
     // Connect to local database
-    _client_local = connect(local_db_ip, local_db_port, db_password, options);
+    _client_local = connect(local_db_ip, local_db_port, db_password, _options);
     if(_client_local) {
         std::cout << "INFO : DatabaseManager - CONNECTED TO LOCAL DATABASE" << std::endl;
     } else {
@@ -33,7 +38,7 @@ DatabaseManager::DatabaseManager(const char *local_db_ip, const char *local_db_p
     }
 
     // Connect to remote database
-    _client_remote = connect(remote_db_ip, remote_db_port, db_password, options);
+    _client_remote = connect(remote_db_ip, remote_db_port, db_password, _options);
     if(_client_remote) {
         std::cout << "INFO : DatabaseManager - CONNECTED TO REMOTE DATABASE" << std::endl;
     } else {
@@ -101,9 +106,39 @@ mongocxx::options::client DatabaseManager::createClientOptions() {
         //std::cout << "Server heartbeat succeeded for server: " << event.host().name << ":" << event.host().port << std::endl;
     });
 
-    apm_opts.on_heartbeat_failed([](const mongocxx::events::heartbeat_failed_event& event) {
-        //std::cerr << "Server heartbeat failed for server: " << event.host().name << ":" << event.host().port
-        //          << " with error: " << event.failure().message() << std::endl;
+    apm_opts.on_heartbeat_failed([this](const mongocxx::events::heartbeat_failed_event& event) {
+        std::string failed_host = std::string(event.host()) + ":" + std::to_string(event.port());
+        std::cerr << "ERROR : DatabaseManager - HEARTBEAT FAILED for :" << failed_host << std::endl;
+
+        volatile int reconnect_attempts = 0;
+
+        while(reconnect_attempts < MAX_RECONNECT_ATTEMPTS) {
+            std::cout << "INFO : DatabaseManager - RECONNECTING TO DATABASE" << std::endl;
+
+            try {
+                if(failed_host == (_local_db_ip+ ":" + _local_db_port)) {
+                    auto new_connection = connect(_local_db_ip.c_str(), _local_db_port.c_str(), _db_password.c_str(), this->_options);
+                    _client_local = std::move(new_connection);
+                    std::cout << "INFO : DatabaseManager - RECONNECTED TO LOCAL DATABASE" << std::endl;
+                    break;
+                }
+
+                if(failed_host == (_remote_db_ip+ ":" + _remote_db_port)) {
+                    auto new_connection = connect(_remote_db_ip.c_str(), _remote_db_port.c_str(), _db_password.c_str(), this->_options);
+                    _client_remote = std::move(new_connection);
+                    std::cout << "INFO : DatabaseManager - RECONNECTED TO REMOTE DATABASE" << std::endl;
+                    break;
+                }
+            }catch (const std::exception& e) {
+                std::cerr << "ERROR : DatabaseManager - RECONNECT FAILED : " << e.what() << std::endl;
+                reconnect_attempts++;
+                std::this_thread::sleep_for(std::chrono::seconds(5));
+            }
+
+            if (reconnect_attempts == MAX_RECONNECT_ATTEMPTS) {
+                std::cerr << "ERROR : DatabaseManager - ALL RECONNECT ATTEMPTS FAILED" << std::endl;
+            }
+        }
     });
 
     mongocxx::options::client client_options;

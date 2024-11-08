@@ -8,6 +8,7 @@
 #include <memory>
 #include <mongocxx/client.hpp>
 
+#define MAX_RECONNECT_ATTEMPTS 5
 
 class DatabaseManager {
 public:
@@ -29,8 +30,16 @@ private:
     static std::unique_ptr<mongocxx::client> _client_local;
     static std::unique_ptr<mongocxx::client> _client_remote;
 
+    std::string _local_db_ip;
+    std::string _local_db_port;
+    std::string _remote_db_ip;
+    std::string _remote_db_port;
+    std::string _db_password;
+
     bool connect_to_local = false;
     bool connect_to_remote = false;
+
+    mongocxx::options::client _options;
 
     DatabaseManager(const char * local_db_ip, const char * local_db_port, const char * remote_db_ip, const char * remote_db_port, const char * db_password);
 
