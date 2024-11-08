@@ -29,6 +29,8 @@ public:
         return _instance.get();
     }
 
+    static std::unique_ptr<mongocxx::client> getConnection();
+
 private:
     static std::unique_ptr<DatabaseManager> _instance;
     static std::unique_ptr<mongocxx::client> _client_local;

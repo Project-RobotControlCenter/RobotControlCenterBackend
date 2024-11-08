@@ -74,6 +74,12 @@ DatabaseManager::~DatabaseManager() {
     std::cout << "INFO : DatabaseManager - DESTRUCTOR COMPLETED" << std::endl;
 }
 
+std::unique_ptr<mongocxx::client> DatabaseManager::getConnection() {
+    if(!_client_local && !_client_remote) return nullptr;
+
+    return std::move(_client_remote ? _client_remote : _client_local);
+}
+
 std::unique_ptr<mongocxx::client> DatabaseManager::connect(const char *db_ip, const char *db_port, const char *db_password, const mongocxx::options::client &options) {
     try {
         const std::string url = "mongodb://admin:" + std::string(db_password) + "@" + std::string(db_ip) + ":" + std::string(db_port);
