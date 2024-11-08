@@ -25,14 +25,15 @@ public:
 
 private:
     static std::unique_ptr<DatabaseManager> _instance;
-    static std::unique_ptr<mongocxx::client> _client;
+    static std::unique_ptr<mongocxx::client> _client_local;
+    static std::unique_ptr<mongocxx::client> _client_remote;
 
     bool connect_to_local = false;
     bool connect_to_remote = false;
 
     DatabaseManager(const char * local_db_ip, const char * local_db_port, const char * remote_db_ip, const char * remote_db_port, const char * db_password);
 
-    bool connect(const char * db_ip, const char * db_port, const char * db_password);
+    std::unique_ptr<mongocxx::client> connect(const char * db_ip, const char * db_port, const char * db_password);
 };
 
 
