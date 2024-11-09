@@ -4,6 +4,10 @@
 
 #ifndef ROBOTMANAGER_H
 #define ROBOTMANAGER_H
+#include <string>
+#include <unordered_map>
+
+class Robot;
 
 class RobotManager {
 public:
@@ -17,6 +21,8 @@ public:
 private:
     RobotManager();
     ~RobotManager();
+
+    std::unordered_map<std::string, Robot> _robots;
 };
 
 
