@@ -19,6 +19,7 @@ public:
     }
 
     bool insertDocument(const std::string& collection_name, const bsoncxx::document::view& document);
+    bool deleteDocument(const std::string& collection_name, const bsoncxx::document::view& filter);
 
 private:
     DatabaseDAO();

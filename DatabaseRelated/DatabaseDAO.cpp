@@ -28,3 +28,17 @@ bool DatabaseDAO::insertDocument(const std::string &collection_name, const bsonc
     }
     return false;
 }
+
+bool DatabaseDAO::deleteDocument(const std::string &collection_name, const bsoncxx::document::view &filter) {
+    try {
+        mongocxx::client* client = DatabaseManager::getConnection().get();
+        if (client) {
+            auto collection = (*client)[DATABASE_NAME][collection_name];
+            auto result = collection.delete_one(filter);
+            return result && result->deleted_count() > 0;
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "ERROR: Failed to delete document: " << e.what() << std::endl;
+    }
+    return false;
+}
