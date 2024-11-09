@@ -42,3 +42,17 @@ bool DatabaseDAO::deleteDocument(const std::string &collection_name, const bsonc
     }
     return false;
 }
+
+bsoncxx::stdx::optional<bsoncxx::document::value> DatabaseDAO::findDocument(const std::string &collection_name,
+    const bsoncxx::document::view &filter) {
+    try {
+        mongocxx::client* client = DatabaseManager::getConnection().get();
+        if (client) {
+            auto collection = (*client)[DATABASE_NAME][collection_name];
+            return collection.find_one(filter);
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "ERROR: Failed to find document: " << e.what() << std::endl;
+    }
+    return bsoncxx::stdx::nullopt;
+}
