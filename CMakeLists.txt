@@ -6,8 +6,10 @@ set(CMAKE_CXX_STANDARD 14)
 add_executable(RobotControlCenterBackend main.cpp
         Validations/DataValidations.cpp
         Validations/DataValidations.h
-        DatabaseManager.cpp
-        DatabaseManager.h)
+        DatabaseRelated/DatabaseManager.cpp
+        DatabaseRelated/DatabaseManager.h
+        DatabaseRelated/DatabaseDAO.cpp
+        DatabaseRelated/DatabaseDAO.h)
 
 find_package(mongocxx REQUIRED)
 find_package(bsoncxx REQUIRED)
