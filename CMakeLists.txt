@@ -7,7 +7,9 @@ add_executable(RobotControlCenterBackend main.cpp
         Validations/DataValidations.cpp
         Validations/DataValidations.h
         DatabaseRelated/DatabaseManager.cpp
-        DatabaseRelated/DatabaseManager.h)
+        DatabaseRelated/DatabaseManager.h
+        DatabaseRelated/DatabaseDAO.cpp
+        DatabaseRelated/DatabaseDAO.h)
 
 find_package(mongocxx REQUIRED)
 find_package(bsoncxx REQUIRED)
