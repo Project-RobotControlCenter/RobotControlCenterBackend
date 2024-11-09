@@ -6,6 +6,7 @@
 #define DATABASEDAO_H
 #include "DatabaseManager.h"
 
+#define DATABASE_NAME "RobocControlCenter"
 
 class DatabaseDAO {
 public:
@@ -16,6 +17,8 @@ public:
         static DatabaseDAO _instance;
         return _instance;
     }
+
+    bool insertDocument(const std::string& collection_name, const bsoncxx::document::view& document);
 
 private:
     DatabaseDAO();
