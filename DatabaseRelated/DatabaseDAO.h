@@ -21,6 +21,7 @@ public:
     bool insertDocument(const std::string& collection_name, const bsoncxx::document::view& document);
     bool deleteDocument(const std::string& collection_name, const bsoncxx::document::view& filter);
     bsoncxx::stdx::optional<bsoncxx::document::value> findDocument(const std::string& collection_name, const bsoncxx::document::view& filter);
+    bool updateDocument(const std::string& collection_name, const bsoncxx::document::view& filter, const bsoncxx::document::view& update);
 
 private:
     DatabaseDAO();

@@ -56,3 +56,18 @@ bsoncxx::stdx::optional<bsoncxx::document::value> DatabaseDAO::findDocument(cons
     }
     return bsoncxx::stdx::nullopt;
 }
+
+bool DatabaseDAO::updateDocument(const std::string &collection_name, const bsoncxx::document::view &filter,
+    const bsoncxx::document::view &update) {
+    try {
+        mongocxx::client* client = DatabaseManager::getConnection().get();
+        if (client) {
+            auto collection = (*client)[DATABASE_NAME][collection_name];
+            auto result = collection.update_one(filter, update);
+            return result && result->modified_count() > 0;
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "ERROR: Failed to update document: " << e.what() << std::endl;
+    }
+    return false;
+}
