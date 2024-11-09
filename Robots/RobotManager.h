@@ -5,8 +5,6 @@
 #ifndef ROBOTMANAGER_H
 #define ROBOTMANAGER_H
 
-
-
 class RobotManager {
 public:
     RobotManager(const RobotManager&) = delete;
@@ -19,7 +17,6 @@ public:
 private:
     RobotManager();
     ~RobotManager();
-
 };
 
 

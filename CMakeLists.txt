@@ -11,7 +11,9 @@ add_executable(RobotControlCenterBackend main.cpp
         DatabaseRelated/DatabaseDAO.cpp
         DatabaseRelated/DatabaseDAO.h
         Robots/RobotManager.cpp
-        Robots/RobotManager.h)
+        Robots/RobotManager.h
+        Robots/Robot.cpp
+        Robots/Robot.h)
 
 find_package(mongocxx REQUIRED)
 find_package(bsoncxx REQUIRED)
