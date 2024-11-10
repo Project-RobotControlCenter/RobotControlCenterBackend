@@ -19,6 +19,7 @@ add_executable(RobotControlCenterBackend main.cpp
 
 find_package(mongocxx REQUIRED)
 find_package(bsoncxx REQUIRED)
+find_package(Boost REQUIRED COMPONENTS system thread)
 
 if(mongocxx_FOUND)
     message(STATUS "mongocxx found!")
@@ -35,3 +36,18 @@ if (bsoncxx_FOUND)
 else ()
     message(FATAL_ERROR "bsoncxx not found!")
 endif ()
+
+if (Boost_FOUND)
+    message(STATUS "Boost found!")
+
+    # Dodaj biblioteki do linkowania
+    target_link_libraries(RobotControlCenterBackend
+            Boost::system
+            Boost::thread
+    )
+
+    # Dodaj katalogi nagłówków
+    target_include_directories(RobotControlCenterBackend PRIVATE ${Boost_INCLUDE_DIRS})
+else()
+    message(FATAL_ERROR "Boost not found!")
+endif()
