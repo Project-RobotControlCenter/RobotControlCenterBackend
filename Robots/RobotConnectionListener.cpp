@@ -55,7 +55,7 @@ void RobotConnectionListener::on_accept_tcp_connection(beast::error_code ec) {
         do_accept_websocket_connection(websocket_stream);
     }
 
-    this->do_accept_tpc_connection();
+    this->do_accept_tcp_connection();
 }
 
 void RobotConnectionListener::do_accept_websocket_connection(const std::shared_ptr<websocket::stream<tcp::socket>>& websocket_stream) {
