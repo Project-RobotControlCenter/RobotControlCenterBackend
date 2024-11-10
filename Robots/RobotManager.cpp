@@ -4,7 +4,11 @@
 
 #include "RobotManager.h"
 
-RobotManager::RobotManager() {
+#include "RobotConnectionListener.h"
+
+std::unique_ptr<RobotManager> RobotManager::_instance = nullptr;
+
+RobotManager::RobotManager(unsigned short _robot_connection_port) {
 
 }
 
