@@ -42,12 +42,14 @@ private:
 
     bool _is_running = false;
 
-    RobotConnectionListener(asio::io_context& ioc, asio::ip::tcp::endpoint endpoint, const std::function<void(websocket::stream<tcp::socket>)> &on_new_connection);
+    RobotConnectionListener(asio::io_context& ioc, const asio::ip::tcp::endpoint &endpoint, const std::function<void(websocket::stream<tcp::socket>)> &on_new_connection);
     ~RobotConnectionListener();
 
     void runImp();
     void do_accept_tpc_connection();
     void on_accept_tcp_connection(beast::error_code ec);
+    void do_accept_websocket_connection(const std::shared_ptr<websocket::stream<tcp::socket>>& websocket_stream);
+    void on_accept_websocket_connection(beast::error_code ec, const std::shared_ptr<websocket::stream<tcp::socket>> &websocket_stream);
 
 };
 

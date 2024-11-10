@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-RobotConnectionListener::RobotConnectionListener(asio::io_context &ioc, asio::ip::tcp::endpoint endpoint,
+RobotConnectionListener::RobotConnectionListener(asio::io_context &ioc, const asio::ip::tcp::endpoint &endpoint,
                                                  const std::function<void(websocket::stream<tcp::socket>)> &on_new_connection)
         : _acceptor(ioc, endpoint), _on_new_robot_connection(on_new_connection) {
     beast::error_code ec;
@@ -51,8 +51,26 @@ void RobotConnectionListener::on_accept_tcp_connection(beast::error_code ec) {
     if (ec) {
         std::cerr << "Exception in Listener::on_accept: " << ec.message() << std::endl;
     } else {
-        // TODO: Make websocket connection from this tcp connection
+        auto websocket_stream = std::make_shared<websocket::stream<tcp::socket>>(std::move(*socket));
+        do_accept_websocket_connection(websocket_stream);
     }
 
     this->do_accept_tpc_connection();
+}
+
+void RobotConnectionListener::do_accept_websocket_connection(const std::shared_ptr<websocket::stream<tcp::socket>>& websocket_stream) {
+    websocket_stream->async_accept(
+        beast::bind_front_handler(
+            &RobotConnectionListener::on_accept_websocket_connection,
+            shared_from_this(),
+            websocket_stream));
+}
+
+void RobotConnectionListener::on_accept_websocket_connection(beast::error_code ec, const std::shared_ptr<websocket::stream<tcp::socket>> &websocket_stream) {
+    if (ec) {
+        std::cerr << "Exception in Listener::on_accept_websocket_connection: " << ec.message() << std::endl;
+        return;
+    }
+    // Connection is fully established; call the callback
+    _on_new_robot_connection(std::move(*websocket_stream));
 }
