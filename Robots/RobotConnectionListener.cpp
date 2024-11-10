@@ -6,6 +6,8 @@
 
 #include <iostream>
 
+std::unique_ptr<RobotConnectionListener> RobotConnectionListener::_instance = nullptr;
+
 RobotConnectionListener::RobotConnectionListener(asio::io_context &ioc, const asio::ip::tcp::endpoint &endpoint,
                                                  const std::function<void(websocket::stream<tcp::socket>)> &on_new_connection)
         : _acceptor(ioc, endpoint), _on_new_robot_connection(on_new_connection) {
