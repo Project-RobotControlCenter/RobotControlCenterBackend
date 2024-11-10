@@ -16,7 +16,7 @@ namespace beast = boost::beast;
 namespace websocket = beast::websocket;
 using tcp = asio::ip::tcp;
 
-class RobotConnectionListener {
+class RobotConnectionListener : public std::enable_shared_from_this<RobotConnectionListener> {
 public:
     RobotConnectionListener(const RobotConnectionListener&) = delete;
     RobotConnectionListener& operator=(const RobotConnectionListener&) = delete;
@@ -33,6 +33,8 @@ public:
         return _instance.get();
     }
 
+    static void run() {getInstance()->runImp();}
+
 private:
     static std::unique_ptr<RobotConnectionListener> _instance;
     asio::ip::tcp::acceptor _acceptor;
@@ -42,6 +44,10 @@ private:
 
     RobotConnectionListener(asio::io_context& ioc, asio::ip::tcp::endpoint endpoint, const std::function<void(websocket::stream<tcp::socket>)> &on_new_connection);
     ~RobotConnectionListener();
+
+    void runImp();
+    void do_accept_tpc_connection();
+    void on_accept_tcp_connection(beast::error_code ec);
 
 };
 

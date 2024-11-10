@@ -33,3 +33,26 @@ RobotConnectionListener::RobotConnectionListener(asio::io_context &ioc, asio::ip
 RobotConnectionListener::~RobotConnectionListener() {
 
 }
+
+void RobotConnectionListener::runImp() {
+    this->do_accept_tpc_connection();
+}
+
+void RobotConnectionListener::do_accept_tpc_connection() {
+    auto socket = std::make_shared<tcp::socket>(_acceptor.get_executor().context());
+    _acceptor.async_accept(
+            *socket,
+            beast::bind_front_handler(
+                &RobotConnectionListener::on_accept_tcp_connection,
+                shared_from_this()));
+}
+
+void RobotConnectionListener::on_accept_tcp_connection(beast::error_code ec) {
+    if (ec) {
+        std::cerr << "Exception in Listener::on_accept: " << ec.message() << std::endl;
+    } else {
+        // TODO: Make websocket connection from this tcp connection
+    }
+
+    this->do_accept_tpc_connection();
+}
