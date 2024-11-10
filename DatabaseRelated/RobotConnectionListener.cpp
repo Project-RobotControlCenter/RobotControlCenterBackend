@@ -49,7 +49,7 @@ void RobotConnectionListener::do_accept_tpc_connection() {
 
 void RobotConnectionListener::on_accept_tcp_connection(beast::error_code ec) {
     if (ec) {
-        std::cerr << "Exception in Listener::on_accept: " << ec.message() << std::endl;
+        handle_error(ec, "Listener::on_accept_tcp_connection");
     } else {
         auto websocket_stream = std::make_shared<websocket::stream<tcp::socket>>(std::move(*socket));
         do_accept_websocket_connection(websocket_stream);
@@ -68,9 +68,12 @@ void RobotConnectionListener::do_accept_websocket_connection(const std::shared_p
 
 void RobotConnectionListener::on_accept_websocket_connection(beast::error_code ec, const std::shared_ptr<websocket::stream<tcp::socket>> &websocket_stream) {
     if (ec) {
-        std::cerr << "Exception in Listener::on_accept_websocket_connection: " << ec.message() << std::endl;
+        handle_error(ec, "Listener::on_accept_websocket_connection");
         return;
     }
-    // Connection is fully established; call the callback
     _on_new_robot_connection(std::move(*websocket_stream));
+}
+
+void RobotConnectionListener::handle_error(const beast::error_code& ec, const std::string& context) {
+    std::cerr << "ERROR : error in " << context << ": " << ec.message() << std::endl;
 }

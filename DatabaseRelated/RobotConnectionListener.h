@@ -51,6 +51,7 @@ private:
     void do_accept_websocket_connection(const std::shared_ptr<websocket::stream<tcp::socket>>& websocket_stream);
     void on_accept_websocket_connection(beast::error_code ec, const std::shared_ptr<websocket::stream<tcp::socket>> &websocket_stream);
 
+    void RobotConnectionListener::handle_error(const beast::error_code& ec, const std::string& context);
 };
 
 
