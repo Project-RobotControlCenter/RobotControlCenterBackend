@@ -18,6 +18,7 @@ public:
         static RobotManager _instance;
         return _instance;
     }
+
 private:
     RobotManager();
     ~RobotManager();
