@@ -26,6 +26,7 @@ class RobotManager {
 public:
     RobotManager(const RobotManager&) = delete;
     RobotManager& operator=(const RobotManager&) = delete;
+    ~RobotManager();
 
     static bool initInstance(asio::io_context &ioc, unsigned short _robot_connection_port) {
         if(!_instance) {
@@ -42,7 +43,6 @@ private:
     static std::unique_ptr<RobotManager> _instance;
 
     RobotManager(asio::io_context &ioc, unsigned short _robot_connection_port);
-    ~RobotManager();
 
     void RobotManager::onNewRobotConnection(websocket::stream<tcp::socket> robot_websocket);
 

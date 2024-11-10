@@ -20,6 +20,7 @@ class RobotConnectionListener : public std::enable_shared_from_this<RobotConnect
 public:
     RobotConnectionListener(const RobotConnectionListener&) = delete;
     RobotConnectionListener& operator=(const RobotConnectionListener&) = delete;
+    ~RobotConnectionListener();
 
     static bool initInstance(asio::io_context& ioc, const asio::ip::tcp::endpoint &endpoint, const std::function<void(websocket::stream<tcp::socket>)> &on_new_connection) {
         if(!_instance) {
@@ -43,7 +44,6 @@ private:
     bool _is_running = false;
 
     RobotConnectionListener(asio::io_context& ioc, const asio::ip::tcp::endpoint &endpoint, const std::function<void(websocket::stream<tcp::socket>)> &on_new_connection);
-    ~RobotConnectionListener();
 
     void runImp();
     void do_accept_tcp_connection();
