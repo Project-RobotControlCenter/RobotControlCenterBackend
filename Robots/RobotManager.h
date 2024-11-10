@@ -32,8 +32,7 @@ public:
     }
 
     static RobotManager& getInstance() {
-        static RobotManager _instance;
-        return _instance;
+        return *_instance;
     }
 
 private:
