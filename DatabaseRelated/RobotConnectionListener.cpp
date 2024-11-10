@@ -35,10 +35,10 @@ RobotConnectionListener::~RobotConnectionListener() {
 }
 
 void RobotConnectionListener::runImp() {
-    this->do_accept_tpc_connection();
+    this->do_accept_tcp_connection();
 }
 
-void RobotConnectionListener::do_accept_tpc_connection() {
+void RobotConnectionListener::do_accept_tcp_connection() {
     auto socket = std::make_shared<tcp::socket>(_acceptor.get_executor().context());
     _acceptor.async_accept(
             *socket,

@@ -46,7 +46,7 @@ private:
     ~RobotConnectionListener();
 
     void runImp();
-    void do_accept_tpc_connection();
+    void do_accept_tcp_connection();
     void on_accept_tcp_connection(beast::error_code ec);
     void do_accept_websocket_connection(const std::shared_ptr<websocket::stream<tcp::socket>>& websocket_stream);
     void on_accept_websocket_connection(beast::error_code ec, const std::shared_ptr<websocket::stream<tcp::socket>> &websocket_stream);
