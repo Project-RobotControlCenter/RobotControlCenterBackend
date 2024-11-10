@@ -14,8 +14,8 @@ add_executable(RobotControlCenterBackend main.cpp
         Robots/RobotManager.h
         Robots/Robot.cpp
         Robots/Robot.h
-        DatabaseRelated/RobotConnectionListener.cpp
-        DatabaseRelated/RobotConnectionListener.h)
+        Robots/RobotConnectionListener.cpp
+        Robots/RobotConnectionListener.h)
 
 find_package(mongocxx REQUIRED)
 find_package(bsoncxx REQUIRED)
