@@ -8,6 +8,15 @@
 #include <string>
 #include <unordered_map>
 
+#include <boost/asio.hpp>
+#include <boost/beast.hpp>
+#include <boost/beast/websocket.hpp>
+
+namespace asio = boost::asio;
+namespace beast = boost::beast;
+namespace websocket = beast::websocket;
+using tcp = asio::ip::tcp;
+
 class Robot;
 
 class RobotManager {
@@ -15,9 +24,9 @@ public:
     RobotManager(const RobotManager&) = delete;
     RobotManager& operator=(const RobotManager&) = delete;
 
-    static bool initInstance(unsigned short _robot_connection_port) {
+    static bool initInstance(asio::io_context &ioc, unsigned short _robot_connection_port) {
         if(!_instance) {
-            _instance = std::unique_ptr<RobotManager>(new RobotManager(_robot_connection_port));
+            _instance = std::unique_ptr<RobotManager>(new RobotManager(ioc, _robot_connection_port));
         }
         return _instance != nullptr;
     }
@@ -30,8 +39,10 @@ public:
 private:
     static std::unique_ptr<RobotManager> _instance;
 
-    RobotManager(unsigned short _robot_connection_port);
+    RobotManager(asio::io_context &ioc, unsigned short _robot_connection_port);
     ~RobotManager();
+
+    void RobotManager::onNewRobotConnection(websocket::stream<tcp::socket> robot_websocket);
 
     std::unordered_map<std::string, Robot> _robots;
 };
