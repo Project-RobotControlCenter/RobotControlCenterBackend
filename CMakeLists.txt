@@ -19,7 +19,7 @@ add_executable(RobotControlCenterBackend main.cpp
 
 find_package(mongocxx REQUIRED)
 find_package(bsoncxx REQUIRED)
-find_package(Boost REQUIRED COMPONENTS system thread)
+find_package(Boost 1.75 REQUIRED COMPONENTS system thread json)
 
 if(mongocxx_FOUND)
     message(STATUS "mongocxx found!")
@@ -44,6 +44,7 @@ if (Boost_FOUND)
     target_link_libraries(RobotControlCenterBackend
             Boost::system
             Boost::thread
+            Boost::json
     )
 
     # Dodaj katalogi nagłówków

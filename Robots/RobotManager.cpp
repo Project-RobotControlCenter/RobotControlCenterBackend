@@ -4,6 +4,7 @@
 
 #include "RobotManager.h"
 #include "RobotConnectionListener.h"
+#include <boost/json.hpp>
 
 std::unique_ptr<RobotManager> RobotManager::_instance = nullptr;
 

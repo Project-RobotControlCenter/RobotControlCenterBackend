@@ -14,12 +14,12 @@
 #include <iostream>
 #include <boost/asio/steady_timer.hpp>
 
+#include "Robot.h"
+
 namespace asio = boost::asio;
 namespace beast = boost::beast;
 namespace websocket = beast::websocket;
 using tcp = asio::ip::tcp;
-
-class Robot;
 
 class RobotManager {
 public:
@@ -43,7 +43,7 @@ private:
 
     RobotManager(asio::io_context &ioc, unsigned short _robot_connection_port);
 
-    void RobotManager::onNewRobotConnection(websocket::stream<tcp::socket> robot_websocket);
+    void onNewRobotConnection(websocket::stream<tcp::socket> robot_websocket);
 
     std::unordered_map<std::string, Robot> _robots;
 };

@@ -44,7 +44,7 @@ private:
 
     bool _is_running = false;
 
-    RobotConnectionListener(asio::io_context& ioc, const asio::ip::tcp::endpoint &endpoint, const std::function<void(websocket::stream<tcp::socket>)> &on_new_connection);
+    RobotConnectionListener(asio::io_context& ioc, const asio::ip::tcp::endpoint &endpoint, std::function<void(websocket::stream<tcp::socket>)> on_new_connection);
 
     void runImp();
     void do_accept_tcp_connection();
