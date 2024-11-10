@@ -43,13 +43,13 @@ void RobotConnectionListener::runImp() {
 void RobotConnectionListener::do_accept_tcp_connection() {
     auto socket = std::make_shared<tcp::socket>(_acceptor.get_executor().context());
     _acceptor.async_accept(
-            *socket,
-            beast::bind_front_handler(
-                &RobotConnectionListener::on_accept_tcp_connection,
-                shared_from_this()));
+        *socket,
+        [this, socket](beast::error_code ec) {
+            on_accept_tcp_connection(ec, socket);
+        });
 }
 
-void RobotConnectionListener::on_accept_tcp_connection(beast::error_code ec) {
+void RobotConnectionListener::on_accept_tcp_connection(beast::error_code ec, std::shared_ptr<tcp::socket> socket) {
     if (ec) {
         handle_error(ec, "Listener::on_accept_tcp_connection");
     } else {
@@ -57,18 +57,17 @@ void RobotConnectionListener::on_accept_tcp_connection(beast::error_code ec) {
         do_accept_websocket_connection(websocket_stream);
     }
 
-    this->do_accept_tcp_connection();
+    do_accept_tcp_connection();
 }
 
 void RobotConnectionListener::do_accept_websocket_connection(const std::shared_ptr<websocket::stream<tcp::socket>>& websocket_stream) {
     websocket_stream->async_accept(
-        beast::bind_front_handler(
-            &RobotConnectionListener::on_accept_websocket_connection,
-            shared_from_this(),
-            websocket_stream));
+        [this, websocket_stream](beast::error_code ec) {
+            on_accept_websocket_connection(ec, websocket_stream);
+        });
 }
 
-void RobotConnectionListener::on_accept_websocket_connection(beast::error_code ec, const std::shared_ptr<websocket::stream<tcp::socket>> &websocket_stream) {
+void RobotConnectionListener::on_accept_websocket_connection(beast::error_code ec, const std::shared_ptr<websocket::stream<tcp::socket>>& websocket_stream) {
     if (ec) {
         handle_error(ec, "Listener::on_accept_websocket_connection");
         return;
