@@ -39,6 +39,7 @@ public:
 private:
     static std::unique_ptr<RobotConnectionListener> _instance;
     asio::ip::tcp::acceptor _acceptor;
+    asio::ip::tcp::socket _socket;
     std::function<void(websocket::stream<tcp::socket>)> _on_new_robot_connection;
 
     bool _is_running = false;
@@ -47,7 +48,7 @@ private:
 
     void runImp();
     void do_accept_tcp_connection();
-    void on_accept_tcp_connection(beast::error_code ec, std::shared_ptr<tcp::socket> socket);
+    void on_accept_tcp_connection(beast::error_code ec, tcp::socket socket);
     void do_accept_websocket_connection(const std::shared_ptr<websocket::stream<tcp::socket>>& websocket_stream);
     void on_accept_websocket_connection(beast::error_code ec, const std::shared_ptr<websocket::stream<tcp::socket>>& websocket_stream);
 

@@ -5,7 +5,6 @@
 #include "RobotManager.h"
 #include "RobotConnectionListener.h"
 
-
 std::unique_ptr<RobotManager> RobotManager::_instance = nullptr;
 
 RobotManager::RobotManager(asio::io_context &ioc, unsigned short _robot_connection_port) {
