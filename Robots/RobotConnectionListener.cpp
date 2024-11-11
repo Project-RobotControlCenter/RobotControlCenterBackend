@@ -49,18 +49,21 @@ void RobotConnectionListener::do_accept_tcp_connection() {
         [this](beast::error_code ec) {
             if (!ec) {
                 // Obsługa zaakceptowanego połączenia
+                std::cout << "DEBUG : RobotConnectionListener - do_accept_tcp_connection - tcp accepted" << std::endl;
                 on_accept_tcp_connection(ec, std::move(_socket));
             } else {
                 // Obsługa błędu
-                std::cerr << "Error accepting connection: " << ec.message() << std::endl;
+                std::cerr << "ERROR : Error accepting connection: " << ec.message() << std::endl;
             }
         });
 }
 
 void RobotConnectionListener::on_accept_tcp_connection(beast::error_code ec, tcp::socket socket) {
     if (ec) {
+        std::cerr << "ERROR : Error accepting connection: " << ec.message() << std::endl;
         handle_error(ec, "Listener::on_accept_tcp_connection");
     } else {
+        std::cout << "DEBUG : TCP CONNECTION ACCEPTED" << std::endl;
         auto websocket_stream = std::make_shared<websocket::stream<tcp::socket>>(std::move(socket));
         do_accept_websocket_connection(websocket_stream);
     }
@@ -71,12 +74,14 @@ void RobotConnectionListener::on_accept_tcp_connection(beast::error_code ec, tcp
 void RobotConnectionListener::do_accept_websocket_connection(const std::shared_ptr<websocket::stream<tcp::socket>>& websocket_stream) {
     websocket_stream->async_accept(
         [this, websocket_stream](beast::error_code ec) {
+            std::cout << "DEBUG : RobotConnectionListener - do_accept_websocket_connection - websocket accepted" << std::endl;
             on_accept_websocket_connection(ec, websocket_stream);
         });
 }
 
 void RobotConnectionListener::on_accept_websocket_connection(beast::error_code ec, const std::shared_ptr<websocket::stream<tcp::socket>>& websocket_stream) {
     if (ec) {
+        std::cerr << "ERROR : Error accepting websocket connection: " << ec.message() << std::endl;
         handle_error(ec, "Listener::on_accept_websocket_connection");
         return;
     }
