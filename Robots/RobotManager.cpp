@@ -8,8 +8,9 @@
 
 std::unique_ptr<RobotManager> RobotManager::_instance = nullptr;
 
-RobotManager::RobotManager(asio::io_context &ioc, unsigned short _robot_connection_port) {
-    RobotConnectionListener::initInstance(ioc, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), _robot_connection_port), std::bind(&RobotManager::onNewRobotConnection, this, std::placeholders::_1));
+RobotManager::RobotManager(asio::io_context &ioc, unsigned short _robot_connection_port)
+    : _ioc(ioc){
+    RobotConnectionListener::initInstance(_ioc, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), _robot_connection_port), std::bind(&RobotManager::onNewRobotConnection, this, std::placeholders::_1));
     RobotConnectionListener::run();
 }
 
@@ -24,7 +25,7 @@ void RobotManager::onNewRobotConnection(websocket::stream<tcp::socket> robot_web
         robot_websocket.text(true);
         robot_websocket.write(asio::buffer(request));
 
-        asio::steady_timer timer(robot_websocket.get_executor().context());
+        asio::steady_timer timer(_ioc);
         timer.expires_after(std::chrono::seconds(5));
 
         bool response_received = false;

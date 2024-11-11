@@ -40,6 +40,7 @@ public:
 
 private:
     static std::unique_ptr<RobotManager> _instance;
+    asio::io_context &_ioc;
 
     RobotManager(asio::io_context &ioc, unsigned short _robot_connection_port);
 
