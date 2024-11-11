@@ -11,6 +11,8 @@ std::unique_ptr<RobotConnectionListener> RobotConnectionListener::_instance = nu
 RobotConnectionListener::RobotConnectionListener(asio::io_context &ioc, const asio::ip::tcp::endpoint &endpoint,
 std::function<void(websocket::stream<tcp::socket>)> on_new_connection)
         : _acceptor(ioc), _socket(ioc), _on_new_robot_connection(std::move(on_new_connection)) {
+    std::cout << "DEBUG : RobotConnectionListener - CONSTRUCTOR" << std::endl;
+
     beast::error_code ec;
 
     // Create the TCP acceptor
@@ -33,7 +35,7 @@ std::function<void(websocket::stream<tcp::socket>)> on_new_connection)
 }
 
 RobotConnectionListener::~RobotConnectionListener() {
-
+    std::cout << "DEBUG : RobotConnectionListener - DESTRUCTOR" << std::endl;
 }
 
 void RobotConnectionListener::runImp() {
