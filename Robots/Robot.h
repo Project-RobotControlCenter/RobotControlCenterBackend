@@ -9,6 +9,7 @@
 
 class Robot {
 public:
+    Robot() = default;
     Robot(std::string db_id, std::string name, std::string mac_address, std::string ip, std::string port, bool isAccepted);
     ~Robot();
 private:
