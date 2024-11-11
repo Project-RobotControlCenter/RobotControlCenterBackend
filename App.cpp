@@ -16,6 +16,9 @@ App::App(int argc, const char *argv[])
 
     asio::io_context ioc{1};
     RobotManager::initInstance(ioc, std::stoi(_robots_websocket_port));
+
+
+    ioc.run();
 }
 
 App::~App() {

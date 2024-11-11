@@ -39,11 +39,13 @@ RobotConnectionListener::~RobotConnectionListener() {
 }
 
 void RobotConnectionListener::runImp() {
+    std::cout << "INFO : RobotConnectionListener - start listening" << std::endl;
     this->do_accept_tcp_connection();
 }
 
 void RobotConnectionListener::do_accept_tcp_connection() {
-    // Zakładam, że _socket jest członkiem klasy, np. std::shared_ptr<tcp::socket> _socket;
+    std::cout << "DEBUG : RobotConnectionListener - do_accept_tcp_connection()" << std::endl;
+
     _acceptor.async_accept(
         _socket,
         [this](beast::error_code ec) {
@@ -59,6 +61,8 @@ void RobotConnectionListener::do_accept_tcp_connection() {
 }
 
 void RobotConnectionListener::on_accept_tcp_connection(beast::error_code ec, tcp::socket socket) {
+    std::cout << "DEBUG : RobotConnectionListener - on_accept_tcp_connection()" << std::endl;
+
     if (ec) {
         std::cerr << "ERROR : Error accepting connection: " << ec.message() << std::endl;
         handle_error(ec, "Listener::on_accept_tcp_connection");
@@ -72,6 +76,8 @@ void RobotConnectionListener::on_accept_tcp_connection(beast::error_code ec, tcp
 }
 
 void RobotConnectionListener::do_accept_websocket_connection(const std::shared_ptr<websocket::stream<tcp::socket>>& websocket_stream) {
+    std::cout << "DEBUG : RobotConnectionListener - do_accept_websocket_connection()" << std::endl;
+
     websocket_stream->async_accept(
         [this, websocket_stream](beast::error_code ec) {
             std::cout << "DEBUG : RobotConnectionListener - do_accept_websocket_connection - websocket accepted" << std::endl;
@@ -80,6 +86,8 @@ void RobotConnectionListener::do_accept_websocket_connection(const std::shared_p
 }
 
 void RobotConnectionListener::on_accept_websocket_connection(beast::error_code ec, const std::shared_ptr<websocket::stream<tcp::socket>>& websocket_stream) {
+    std::cout << "DEBUG : RobotConnectionListener - on_accept_websocket_connection()" << std::endl;
+
     if (ec) {
         std::cerr << "ERROR : Error accepting websocket connection: " << ec.message() << std::endl;
         handle_error(ec, "Listener::on_accept_websocket_connection");
