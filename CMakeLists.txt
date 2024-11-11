@@ -9,10 +9,17 @@ add_executable(RobotControlCenterBackend main.cpp
         DatabaseRelated/DatabaseManager.cpp
         DatabaseRelated/DatabaseManager.h
         DatabaseRelated/DatabaseDAO.cpp
-        DatabaseRelated/DatabaseDAO.h)
+        DatabaseRelated/DatabaseDAO.h
+        Robots/RobotManager.cpp
+        Robots/RobotManager.h
+        Robots/Robot.cpp
+        Robots/Robot.h
+        Robots/RobotConnectionListener.cpp
+        Robots/RobotConnectionListener.h)
 
 find_package(mongocxx REQUIRED)
 find_package(bsoncxx REQUIRED)
+find_package(Boost 1.75 REQUIRED COMPONENTS system thread json)
 
 if(mongocxx_FOUND)
     message(STATUS "mongocxx found!")
@@ -29,3 +36,19 @@ if (bsoncxx_FOUND)
 else ()
     message(FATAL_ERROR "bsoncxx not found!")
 endif ()
+
+if (Boost_FOUND)
+    message(STATUS "Boost found!")
+
+    # Dodaj biblioteki do linkowania
+    target_link_libraries(RobotControlCenterBackend
+            Boost::system
+            Boost::thread
+            Boost::json
+    )
+
+    # Dodaj katalogi nagłówków
+    target_include_directories(RobotControlCenterBackend PRIVATE /usr/local/include/boost)
+else()
+    message(FATAL_ERROR "Boost not found!")
+endif()

@@ -25,6 +25,8 @@ DatabaseManager::DatabaseManager(const char *local_db_ip, const char *local_db_p
     const char *remote_db_port, const char *db_password)
         : _local_db_ip(local_db_ip), _local_db_port(local_db_port), _remote_db_ip(remote_db_ip), _remote_db_port(remote_db_port), _db_password(db_password)
 {
+    std::cout << "DEBUG : DatabaseManager - CONSTRUCTOR" << std::endl;
+
     mongocxx::instance instance{};
 
     _options = createClientOptions();
@@ -51,7 +53,7 @@ DatabaseManager::DatabaseManager(const char *local_db_ip, const char *local_db_p
 }
 
 DatabaseManager::~DatabaseManager() {
-    std::cout << "INFO : DatabaseManager - DESTRUCTOR - Closing database connections" << std::endl;
+    std::cout << "DEBUG : DatabaseManager - DESTRUCTOR" << std::endl;
 
     if (_client_local) {
         try {
