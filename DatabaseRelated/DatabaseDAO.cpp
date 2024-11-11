@@ -9,9 +9,11 @@
 
 
 DatabaseDAO::DatabaseDAO() {
+    std::cout << "DEBUG : DatabaseDAO - CONSTRUCTOR" << std::endl;
 }
 
 DatabaseDAO::~DatabaseDAO() {
+    std::cout << "DEBUG : DatabaseDAO - DESTRUCTOR" << std::endl;
 }
 
 
