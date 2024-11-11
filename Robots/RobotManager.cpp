@@ -13,8 +13,12 @@ RobotManager::RobotManager(asio::io_context &ioc, unsigned short _robot_connecti
     std::cout << "DEBUG : RobotManager - CONSTRUCTOR" << std::endl;
 
     // Inicjalizacja Listenera
-    RobotConnectionListener::initInstance(_ioc, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), _robot_connection_port), std::bind(&RobotManager::onNewRobotConnection, this, std::placeholders::_1));
-    RobotConnectionListener::run();
+    if(RobotConnectionListener::initInstance(_ioc, asio::ip::tcp::endpoint(asio::ip::address_v4::any(), _robot_connection_port), std::bind(&RobotManager::onNewRobotConnection, this, std::placeholders::_1))) {
+        std::cout << "INFO : RobotManager - Listener initialized" << std::endl;
+        RobotConnectionListener::run();
+    } else {
+        std::cerr << "ERROR : RobotManager - Listener initialization failed" << std::endl;
+    }
 }
 
 RobotManager::~RobotManager() {

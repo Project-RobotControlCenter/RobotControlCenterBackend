@@ -10,7 +10,9 @@ std::unique_ptr<RobotConnectionListener> RobotConnectionListener::_instance = nu
 
 RobotConnectionListener::RobotConnectionListener(asio::io_context &ioc, const asio::ip::tcp::endpoint &endpoint,
 std::function<void(websocket::stream<tcp::socket>)> on_new_connection)
-        : _acceptor(ioc, endpoint), _socket(ioc), _on_new_robot_connection(std::move(on_new_connection)) {
+        : _acceptor(ioc), _socket(ioc), _on_new_robot_connection(std::move(on_new_connection)) {
+    std::cout << "DEBUG : RobotConnectionListener - CONSTRUCTOR" << std::endl;
+
     beast::error_code ec;
 
     // Create the TCP acceptor
@@ -33,32 +35,39 @@ std::function<void(websocket::stream<tcp::socket>)> on_new_connection)
 }
 
 RobotConnectionListener::~RobotConnectionListener() {
-
+    std::cout << "DEBUG : RobotConnectionListener - DESTRUCTOR" << std::endl;
 }
 
 void RobotConnectionListener::runImp() {
+    std::cout << "INFO : RobotConnectionListener - start listening" << std::endl;
     this->do_accept_tcp_connection();
 }
 
 void RobotConnectionListener::do_accept_tcp_connection() {
-    // Zakładam, że _socket jest członkiem klasy, np. std::shared_ptr<tcp::socket> _socket;
+    std::cout << "DEBUG : RobotConnectionListener - do_accept_tcp_connection()" << std::endl;
+
     _acceptor.async_accept(
         _socket,
         [this](beast::error_code ec) {
             if (!ec) {
                 // Obsługa zaakceptowanego połączenia
+                std::cout << "DEBUG : RobotConnectionListener - do_accept_tcp_connection - tcp accepted" << std::endl;
                 on_accept_tcp_connection(ec, std::move(_socket));
             } else {
                 // Obsługa błędu
-                std::cerr << "Error accepting connection: " << ec.message() << std::endl;
+                std::cerr << "ERROR : Error accepting connection: " << ec.message() << std::endl;
             }
         });
 }
 
 void RobotConnectionListener::on_accept_tcp_connection(beast::error_code ec, tcp::socket socket) {
+    std::cout << "DEBUG : RobotConnectionListener - on_accept_tcp_connection()" << std::endl;
+
     if (ec) {
+        std::cerr << "ERROR : Error accepting connection: " << ec.message() << std::endl;
         handle_error(ec, "Listener::on_accept_tcp_connection");
     } else {
+        std::cout << "DEBUG : TCP CONNECTION ACCEPTED" << std::endl;
         auto websocket_stream = std::make_shared<websocket::stream<tcp::socket>>(std::move(socket));
         do_accept_websocket_connection(websocket_stream);
     }
@@ -67,14 +76,20 @@ void RobotConnectionListener::on_accept_tcp_connection(beast::error_code ec, tcp
 }
 
 void RobotConnectionListener::do_accept_websocket_connection(const std::shared_ptr<websocket::stream<tcp::socket>>& websocket_stream) {
+    std::cout << "DEBUG : RobotConnectionListener - do_accept_websocket_connection()" << std::endl;
+
     websocket_stream->async_accept(
         [this, websocket_stream](beast::error_code ec) {
+            std::cout << "DEBUG : RobotConnectionListener - do_accept_websocket_connection - websocket accepted" << std::endl;
             on_accept_websocket_connection(ec, websocket_stream);
         });
 }
 
 void RobotConnectionListener::on_accept_websocket_connection(beast::error_code ec, const std::shared_ptr<websocket::stream<tcp::socket>>& websocket_stream) {
+    std::cout << "DEBUG : RobotConnectionListener - on_accept_websocket_connection()" << std::endl;
+
     if (ec) {
+        std::cerr << "ERROR : Error accepting websocket connection: " << ec.message() << std::endl;
         handle_error(ec, "Listener::on_accept_websocket_connection");
         return;
     }

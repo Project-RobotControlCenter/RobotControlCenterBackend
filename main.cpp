@@ -1,6 +1,7 @@
 #include <csignal>
 #include <iostream>
 
+#include "App.h"
 #include "Validations/DataValidations.h"
 
 // Local_network_db_ip Local_network_db_port Global_network_db_ip Global_network_db_port db_password frontend_websocket_port robots_websocket_port
@@ -33,6 +34,8 @@ int main(int argc, const char * argv[])
         std::cerr << "ERROR : Invalid arguments provided.\n";
         return 1;
     }
+
+    App::initInstance(argc, argv);
 
     while(run) {
         sleep(2);
