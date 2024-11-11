@@ -48,7 +48,7 @@ if (Boost_FOUND)
     )
 
     # Dodaj katalogi nagłówków
-    target_include_directories(RobotControlCenterBackend PRIVATE ${Boost_INCLUDE_DIRS})
+    target_include_directories(RobotControlCenterBackend PRIVATE /usr/local/include/boost)
 else()
     message(FATAL_ERROR "Boost not found!")
 endif()
