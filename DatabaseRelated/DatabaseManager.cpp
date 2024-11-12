@@ -52,7 +52,9 @@ DatabaseManager::DatabaseManager(std::string local_db_ip, std::string local_db_p
         std::cout << "INFO : DatabaseManager - CONNECTED TO DATABASES" << std::endl;
     }
 
-
+    if(DatabaseDAO::initInstance("RobocControlCenter")) {
+        std::cout << "INFO : DatabaseManager - DatabaseDAO initialized" << std::endl;
+    } else std::cerr << "ERROR : DatabaseManager - DatabaseDAO initialization failed" << std::endl;
 }
 
 DatabaseManager::~DatabaseManager() {

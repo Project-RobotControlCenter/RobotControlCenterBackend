@@ -123,6 +123,8 @@ void RobotManager::onNewRobotConnection(websocket::stream<tcp::socket> robot_web
             }
             Robot& robot = result.first->second; // Reference to the newly added robot
 
+            std::cout << "bp 1" << std::endl;
+
             // Add this robot to database
             bsoncxx::builder::stream::document document_builder;
             document_builder << "db_id" << robot.getDbId()
@@ -134,8 +136,10 @@ void RobotManager::onNewRobotConnection(websocket::stream<tcp::socket> robot_web
 
             bsoncxx::document::value document_value = document_builder << bsoncxx::builder::stream::finalize;
 
+            std::cout << "bp 2" << std::endl;
+
             // Insert into database using DatabaseDAO
-            if (DatabaseDAO::insertDocument("robots_collection", document_value.view())) {
+            if (DatabaseDAO::insertDocument("Robots", document_value.view())) {
                 std::cout << "INFO : Robot successfully added to the database." << std::endl;
             } else {
                 std::cerr << "ERROR : Failed to add Robot to the database." << std::endl;
