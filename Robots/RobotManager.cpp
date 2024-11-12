@@ -127,8 +127,7 @@ void RobotManager::onNewRobotConnection(websocket::stream<tcp::socket> robot_web
 
             // Add this robot to database
             bsoncxx::builder::stream::document document_builder;
-            document_builder << "db_id" << robot.getDbId()
-                             << "name" << robot.getName()
+            document_builder << "name" << robot.getName()
                              << "mac_address" << robot.getMacAddress()
                              << "ip" << robot.getIp()
                              << "port" << static_cast<int>(robot.getPort())  // Ensure type compatibility
