@@ -20,7 +20,7 @@ DatabaseDAO::~DatabaseDAO() {
 
 bool DatabaseDAO::insertDocumentImp(const std::string &collection_name, const bsoncxx::document::view &document) {
     try {
-        const mongocxx::client* client = DatabaseManager::getConnection().get();
+        const mongocxx::client* client = DatabaseManager::getConnection();
         if (client) {
             auto collection = (*client)[_database_name][collection_name];
             collection.insert_one(document);
@@ -34,7 +34,7 @@ bool DatabaseDAO::insertDocumentImp(const std::string &collection_name, const bs
 
 bool DatabaseDAO::deleteDocumentImp(const std::string &collection_name, const bsoncxx::document::view &filter) {
     try {
-        const mongocxx::client* client = DatabaseManager::getConnection().get();
+        const mongocxx::client* client = DatabaseManager::getConnection();
         if (client) {
             auto collection = (*client)[_database_name][collection_name];
             auto result = collection.delete_one(filter);
@@ -49,7 +49,7 @@ bool DatabaseDAO::deleteDocumentImp(const std::string &collection_name, const bs
 bsoncxx::stdx::optional<bsoncxx::document::value> DatabaseDAO::findDocumentImp(const std::string &collection_name,
     const bsoncxx::document::view &filter) {
     try {
-        const mongocxx::client* client = DatabaseManager::getConnection().get();
+        const mongocxx::client* client = DatabaseManager::getConnection();
         if (client) {
             auto collection = (*client)[_database_name][collection_name];
             return collection.find_one(filter);
@@ -63,7 +63,7 @@ bsoncxx::stdx::optional<bsoncxx::document::value> DatabaseDAO::findDocumentImp(c
 bool DatabaseDAO::updateDocumentImp(const std::string &collection_name, const bsoncxx::document::view &filter,
     const bsoncxx::document::view &update) {
     try {
-        const mongocxx::client* client = DatabaseManager::getConnection().get();
+        const mongocxx::client* client = DatabaseManager::getConnection();
         if (client) {
             auto collection = (*client)[_database_name][collection_name];
             auto result = collection.update_one(filter, update);

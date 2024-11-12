@@ -29,12 +29,12 @@ public:
         return _instance.get();
     }
 
-    static std::unique_ptr<mongocxx::client> getConnection();
+    static mongocxx::client * getConnection() {return getInstance()->getConnectionImp();}
 
 private:
     static std::unique_ptr<DatabaseManager> _instance;
-    static std::unique_ptr<mongocxx::client> _client_local;
-    static std::unique_ptr<mongocxx::client> _client_remote;
+    std::unique_ptr<mongocxx::client> _client_local;
+    std::unique_ptr<mongocxx::client> _client_remote;
 
     std::string _local_db_ip;
     std::string _local_db_port;
@@ -48,6 +48,7 @@ private:
     mongocxx::options::client _options;
 
     DatabaseManager(std::string local_db_ip, std::string local_db_port, std::string remote_db_ip, std::string remote_db_port, std::string db_password);
+    mongocxx::client* getConnectionImp() const;
 
     std::unique_ptr<mongocxx::client> connect(const char * db_ip, const char * db_port, const char * db_password,  const mongocxx::options::client &options);
     bool isConnected(const std::unique_ptr<mongocxx::client>& client);

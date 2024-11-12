@@ -19,8 +19,8 @@
 
 
 std::unique_ptr<DatabaseManager> DatabaseManager::_instance = nullptr;
-std::unique_ptr<mongocxx::client> DatabaseManager::_client_local = nullptr;
-std::unique_ptr<mongocxx::client> DatabaseManager::_client_remote = nullptr;
+// std::unique_ptr<mongocxx::client> DatabaseManager::_client_local = nullptr;
+// std::unique_ptr<mongocxx::client> DatabaseManager::_client_remote = nullptr;
 
 DatabaseManager::DatabaseManager(std::string local_db_ip, std::string local_db_port, std::string remote_db_ip,
     std::string remote_db_port, std::string db_password)
@@ -85,10 +85,10 @@ DatabaseManager::~DatabaseManager() {
     std::cout << "INFO : DatabaseManager - DESTRUCTOR COMPLETED" << std::endl;
 }
 
-std::unique_ptr<mongocxx::client> DatabaseManager::getConnection() {
+mongocxx::client * DatabaseManager::getConnectionImp() const {
     if(!_client_local && !_client_remote) return nullptr;
 
-    return std::move(_client_remote ? _client_remote : _client_local);
+    return (_client_remote ? _client_remote.get() : _client_local.get());
 }
 
 std::unique_ptr<mongocxx::client> DatabaseManager::connect(const char *db_ip, const char *db_port, const char *db_password, const mongocxx::options::client &options) {
