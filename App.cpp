@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include "DatabaseRelated/DatabaseManager.h"
+#include "FrontendRelated/FrontendManager.h"
 #include "Robots/RobotManager.h"
 
 std::unique_ptr<App> App::_instance = nullptr;
@@ -23,6 +24,10 @@ App::App(int argc, const char *argv[])
 
     if(RobotManager::initInstance(ioc, std::stoi(_robots_websocket_port))) {
         std::cout << "INFO : App - RobotManager initialized" << std::endl;
+    }
+
+    if(FrontendManager::initInstance(ioc, std::stoi(_frontend_websocket_port))) {
+        std::cout << "INFO : App - FrontendManager initialized" << std::endl;
     }
 
     ioc.run();

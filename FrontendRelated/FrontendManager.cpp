@@ -6,6 +6,7 @@
 
 #include "FrontendConnectionListener.h"
 
+std::unique_ptr<FrontendManager> FrontendManager::_instance = nullptr;
 
 FrontendManager::FrontendManager(asio::io_context &ioc, unsigned short _frontend_connection_port)
     : _ioc(ioc) {
