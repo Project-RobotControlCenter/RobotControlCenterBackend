@@ -15,6 +15,7 @@
 #include <mongocxx/options/client.hpp>
 #include <mongocxx/options/apm.hpp>
 
+#include "DatabaseDAO.h"
 
 
 std::unique_ptr<DatabaseManager> DatabaseManager::_instance = nullptr;
@@ -50,6 +51,8 @@ DatabaseManager::DatabaseManager(std::string local_db_ip, std::string local_db_p
     if(_client_local || _client_remote) {
         std::cout << "INFO : DatabaseManager - CONNECTED TO DATABASES" << std::endl;
     }
+
+    if(DatabaseDAO::i)
 }
 
 DatabaseManager::~DatabaseManager() {
