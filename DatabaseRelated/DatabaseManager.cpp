@@ -21,8 +21,8 @@ std::unique_ptr<DatabaseManager> DatabaseManager::_instance = nullptr;
 std::unique_ptr<mongocxx::client> DatabaseManager::_client_local = nullptr;
 std::unique_ptr<mongocxx::client> DatabaseManager::_client_remote = nullptr;
 
-DatabaseManager::DatabaseManager(const char *local_db_ip, const char *local_db_port, const char *remote_db_ip,
-    const char *remote_db_port, const char *db_password)
+DatabaseManager::DatabaseManager(std::string local_db_ip, std::string local_db_port, std::string remote_db_ip,
+    std::string remote_db_port, std::string db_password)
         : _local_db_ip(local_db_ip), _local_db_port(local_db_port), _remote_db_ip(remote_db_ip), _remote_db_port(remote_db_port), _db_password(db_password)
 {
     std::cout << "DEBUG : DatabaseManager - CONSTRUCTOR" << std::endl;
@@ -32,7 +32,7 @@ DatabaseManager::DatabaseManager(const char *local_db_ip, const char *local_db_p
     _options = createClientOptions();
 
     // Connect to local database
-    _client_local = connect(local_db_ip, local_db_port, db_password, _options);
+    _client_local = connect(local_db_ip.c_str(), local_db_port.c_str(), db_password.c_str(), _options);
     if(_client_local) {
         std::cout << "INFO : DatabaseManager - CONNECTED TO LOCAL DATABASE" << std::endl;
     } else {
@@ -40,7 +40,7 @@ DatabaseManager::DatabaseManager(const char *local_db_ip, const char *local_db_p
     }
 
     // Connect to remote database
-    _client_remote = connect(remote_db_ip, remote_db_port, db_password, _options);
+    _client_remote = connect(remote_db_ip.c_str(), remote_db_port.c_str(), db_password.c_str(), _options);
     if(_client_remote) {
         std::cout << "INFO : DatabaseManager - CONNECTED TO REMOTE DATABASE" << std::endl;
     } else {

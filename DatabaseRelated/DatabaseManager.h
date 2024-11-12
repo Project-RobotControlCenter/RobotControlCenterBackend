@@ -17,7 +17,7 @@ public:
     DatabaseManager& operator=(const DatabaseManager&) = delete;
     ~DatabaseManager();
 
-    static bool initInstance(const char * local_db_ip, const char * local_db_port,const char * remote_db_ip, const char * remote_db_port, const char *db_password) {
+    static bool initInstance(std::string local_db_ip, std::string local_db_port, std::string remote_db_ip, std::string remote_db_port, std::string db_password) {
         if(!_instance) {
             _instance = std::unique_ptr<DatabaseManager>(new DatabaseManager(local_db_ip, local_db_port, remote_db_ip, remote_db_port, db_password));
         }
@@ -47,7 +47,7 @@ private:
 
     mongocxx::options::client _options;
 
-    DatabaseManager(const char * local_db_ip, const char * local_db_port, const char * remote_db_ip, const char * remote_db_port, const char * db_password);
+    DatabaseManager(std::string local_db_ip, std::string local_db_port, std::string remote_db_ip, std::string remote_db_port, std::string db_password);
 
     std::unique_ptr<mongocxx::client> connect(const char * db_ip, const char * db_port, const char * db_password,  const mongocxx::options::client &options);
     bool isConnected(const std::unique_ptr<mongocxx::client>& client);

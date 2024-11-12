@@ -6,6 +6,7 @@
 
 #include <iostream>
 
+#include "DatabaseRelated/DatabaseManager.h"
 #include "Robots/RobotManager.h"
 
 std::unique_ptr<App> App::_instance = nullptr;
@@ -17,7 +18,7 @@ App::App(int argc, const char *argv[])
     asio::io_context ioc{1};
     RobotManager::initInstance(ioc, std::stoi(_robots_websocket_port));
 
-
+    DatabaseManager::initInstance(_db_local_ip, _db_local_port, _db_remove_ip, _db_remove_port, _db_password);
     ioc.run();
 }
 
