@@ -15,6 +15,7 @@ namespace websocket = beast::websocket;
 using tcp = asio::ip::tcp;
 
 class FrontendConnectionListener {
+public:
     FrontendConnectionListener(const FrontendConnectionListener&) = delete;
     FrontendConnectionListener& operator=(const FrontendConnectionListener&) = delete;
     ~FrontendConnectionListener();

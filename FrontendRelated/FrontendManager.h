@@ -22,9 +22,9 @@ public:
     FrontendManager& operator=(const FrontendManager&) = delete;
     ~FrontendManager();
 
-    static bool initInstance(asio::io_context &ioc, unsigned short _robot_connection_port) {
+    static bool initInstance(asio::io_context &ioc, unsigned short _frontend_connection_port) {
         if(!_instance) {
-            _instance = std::unique_ptr<FrontendManager>(new FrontendManager(ioc, _robot_connection_port));
+            _instance = std::unique_ptr<FrontendManager>(new FrontendManager(ioc, _frontend_connection_port));
         }
         return _instance != nullptr;
     }
@@ -37,7 +37,7 @@ private:
     static std::unique_ptr<FrontendManager> _instance;
     asio::io_context &_ioc;
 
-    FrontendManager(asio::io_context &ioc, unsigned short _robot_connection_port);
+    FrontendManager(asio::io_context &ioc, unsigned short _frontend_connection_port);
 
     void onNewFrontendConnection(websocket::stream<tcp::socket> robot_websocket);
 };
