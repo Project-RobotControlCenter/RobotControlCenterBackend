@@ -88,7 +88,7 @@ DatabaseManager::~DatabaseManager() {
 mongocxx::client * DatabaseManager::getConnectionImp() const {
     if(!_client_local && !_client_remote) return nullptr;
 
-    return (_client_remote ? _client_remote.get() : _client_local.get());
+    return (_client_local ? _client_local.get() : _client_remote.get());
 }
 
 std::unique_ptr<mongocxx::client> DatabaseManager::connect(const char *db_ip, const char *db_port, const char *db_password, const mongocxx::options::client &options) {
