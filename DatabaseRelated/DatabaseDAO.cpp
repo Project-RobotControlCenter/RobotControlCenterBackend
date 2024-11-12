@@ -5,10 +5,11 @@
 #include "DatabaseDAO.h"
 
 #include <iostream>
+#include <utility>
 
+std::unique_ptr<DatabaseDAO> DatabaseDAO::_instance = nullptr;
 
-
-DatabaseDAO::DatabaseDAO() {
+DatabaseDAO::DatabaseDAO(std::string database_name) : _database_name(std::move(database_name)) {
     std::cout << "DEBUG : DatabaseDAO - CONSTRUCTOR" << std::endl;
 }
 
@@ -17,11 +18,11 @@ DatabaseDAO::~DatabaseDAO() {
 }
 
 
-bool DatabaseDAO::insertDocument(const std::string &collection_name, const bsoncxx::document::view &document) {
+bool DatabaseDAO::insertDocumentImp(const std::string &collection_name, const bsoncxx::document::view &document) {
     try {
-        mongocxx::client* client = DatabaseManager::getConnection().get();
+        const mongocxx::client* client = DatabaseManager::getConnection().get();
         if (client) {
-            auto collection = (*client)[DATABASE_NAME][collection_name];
+            auto collection = (*client)[_database_name][collection_name];
             collection.insert_one(document);
             return true;
         }
@@ -31,11 +32,11 @@ bool DatabaseDAO::insertDocument(const std::string &collection_name, const bsonc
     return false;
 }
 
-bool DatabaseDAO::deleteDocument(const std::string &collection_name, const bsoncxx::document::view &filter) {
+bool DatabaseDAO::deleteDocumentImp(const std::string &collection_name, const bsoncxx::document::view &filter) {
     try {
-        mongocxx::client* client = DatabaseManager::getConnection().get();
+        const mongocxx::client* client = DatabaseManager::getConnection().get();
         if (client) {
-            auto collection = (*client)[DATABASE_NAME][collection_name];
+            auto collection = (*client)[_database_name][collection_name];
             auto result = collection.delete_one(filter);
             return result && result->deleted_count() > 0;
         }
@@ -45,12 +46,12 @@ bool DatabaseDAO::deleteDocument(const std::string &collection_name, const bsonc
     return false;
 }
 
-bsoncxx::stdx::optional<bsoncxx::document::value> DatabaseDAO::findDocument(const std::string &collection_name,
+bsoncxx::stdx::optional<bsoncxx::document::value> DatabaseDAO::findDocumentImp(const std::string &collection_name,
     const bsoncxx::document::view &filter) {
     try {
-        mongocxx::client* client = DatabaseManager::getConnection().get();
+        const mongocxx::client* client = DatabaseManager::getConnection().get();
         if (client) {
-            auto collection = (*client)[DATABASE_NAME][collection_name];
+            auto collection = (*client)[_database_name][collection_name];
             return collection.find_one(filter);
         }
     } catch (const std::exception& e) {
@@ -59,12 +60,12 @@ bsoncxx::stdx::optional<bsoncxx::document::value> DatabaseDAO::findDocument(cons
     return bsoncxx::stdx::nullopt;
 }
 
-bool DatabaseDAO::updateDocument(const std::string &collection_name, const bsoncxx::document::view &filter,
+bool DatabaseDAO::updateDocumentImp(const std::string &collection_name, const bsoncxx::document::view &filter,
     const bsoncxx::document::view &update) {
     try {
-        mongocxx::client* client = DatabaseManager::getConnection().get();
+        const mongocxx::client* client = DatabaseManager::getConnection().get();
         if (client) {
-            auto collection = (*client)[DATABASE_NAME][collection_name];
+            auto collection = (*client)[_database_name][collection_name];
             auto result = collection.update_one(filter, update);
             return result && result->modified_count() > 0;
         }

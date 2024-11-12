@@ -52,7 +52,7 @@ DatabaseManager::DatabaseManager(std::string local_db_ip, std::string local_db_p
         std::cout << "INFO : DatabaseManager - CONNECTED TO DATABASES" << std::endl;
     }
 
-    if(DatabaseDAO::i)
+
 }
 
 DatabaseManager::~DatabaseManager() {
@@ -74,6 +74,10 @@ DatabaseManager::~DatabaseManager() {
         } catch (const std::exception& e) {
             std::cerr << "ERROR : DatabaseManager - Failed to close remote database connection: " << e.what() << std::endl;
         }
+    }
+
+    if(DatabaseDAO::initInstance("RobocControlCenter")) {
+        std::cout << "INFO : DatabaseManager - DatabaseDAO initialized" << std::endl;
     }
 
     std::cout << "INFO : DatabaseManager - DESTRUCTOR COMPLETED" << std::endl;

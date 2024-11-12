@@ -135,7 +135,7 @@ void RobotManager::onNewRobotConnection(websocket::stream<tcp::socket> robot_web
             bsoncxx::document::value document_value = document_builder << bsoncxx::builder::stream::finalize;
 
             // Insert into database using DatabaseDAO
-            if (DatabaseDAO::getInstance().insertDocument("robots_collection", document_value.view())) {
+            if (DatabaseDAO::insertDocument("robots_collection", document_value.view())) {
                 std::cout << "INFO : Robot successfully added to the database." << std::endl;
             } else {
                 std::cerr << "ERROR : Failed to add Robot to the database." << std::endl;
