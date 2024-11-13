@@ -14,3 +14,14 @@ Robot::Robot(websocket::stream<tcp::socket> &robot_websocket,std::string db_id, 
 
 Robot::~Robot() {
 }
+
+void Robot::sendMessage(const json::value &message) {
+    try {
+        std::string serialized_message = json::serialize(message);
+        _robot_websocket.text(true); // Set the WebSocket message mode to text
+        _robot_websocket.write(boost::asio::buffer(serialized_message));
+        std::cout << "Sent message: " << serialized_message << std::endl;
+    } catch (const boost::system::system_error& se) {
+        std::cerr << "Error while sending message: " << se.what() << std::endl;
+    }
+}

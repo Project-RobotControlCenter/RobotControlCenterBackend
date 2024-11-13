@@ -11,11 +11,13 @@
 #include <iostream>
 #include <boost/asio/steady_timer.hpp>
 #include <utility>
+#include <boost/json.hpp>
 
 namespace asio = boost::asio;
 namespace beast = boost::beast;
 namespace websocket = beast::websocket;
 using tcp = asio::ip::tcp;
+namespace json = boost::json;
 
 class Robot {
 public:
@@ -29,6 +31,8 @@ public:
     std::string getIp() {return _ip;}
     unsigned char getPort() const {return _port;}
     bool isAccepted() const {return _isAccepted;}
+
+    void sendMessage(const json::value& message);
 
 private:
     websocket::stream<tcp::socket> _robot_websocket;
