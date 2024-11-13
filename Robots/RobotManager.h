@@ -13,6 +13,7 @@
 #include <boost/beast/websocket.hpp>
 #include <iostream>
 #include <boost/asio/steady_timer.hpp>
+#include <utility>
 
 #include "Robot.h"
 
@@ -38,6 +39,8 @@ public:
         return *_instance;
     }
 
+    static std::shared_ptr<Robot> getRobot(const std::string &mac_address) {return getInstance().getRobotImp(mac_address);}
+
 private:
     static std::unique_ptr<RobotManager> _instance;
     asio::io_context &_ioc;
@@ -46,7 +49,9 @@ private:
 
     void onNewRobotConnection(websocket::stream<tcp::socket> robot_websocket);
 
-    std::unordered_map<std::string, Robot> _robots;
+    std::unordered_map<std::string, std::shared_ptr<Robot>> _robots;
+
+    std::shared_ptr<Robot> getRobotImp(const std::string &mac_address);
 };
 
 
