@@ -32,6 +32,16 @@ RobotManager::~RobotManager() {
     std::cout << "DEBUG : RobotManager - DESTRUCTOR" << std::endl;
 }
 
+std::shared_ptr<Robot> RobotManager::getRobotImp(const std::string& mac_address) {
+    const auto it = _robots.find(mac_address);
+    if (it != _robots.end() && it->second) {
+        if (it->second.use_count() == 1) {
+            return it->second;
+        }
+    }
+    return nullptr;
+}
+
 void RobotManager::onNewRobotConnection(websocket::stream<tcp::socket> robot_websocket) {
     std::cout << "INFO : RobotManager - New robot connected" << std::endl;
 
@@ -116,22 +126,22 @@ void RobotManager::onNewRobotConnection(websocket::stream<tcp::socket> robot_web
 
             //Add to _robots
             std::cout << "Add robot" << std::endl;
-            auto result = _robots.emplace(mac_address, Robot("", internal_robot_name, mac_address, ip, port, false));
+            auto result = _robots.emplace(mac_address, std::make_shared<Robot>(robot_websocket, "", internal_robot_name, mac_address, ip, port, false));
             if (!result.second) {
                 std::cerr << "ERROR: Robot with MAC address " << mac_address << " already exists or failed to add." << std::endl;
                 return; // Handle the error case appropriately
             }
-            Robot& robot = result.first->second; // Reference to the newly added robot
+            Robot * robot = result.first->second.get(); // Reference to the newly added robot
 
             std::cout << "bp 1" << std::endl;
 
             // Add this robot to database
             bsoncxx::builder::stream::document document_builder;
-            document_builder << "name" << robot.getName()
-                             << "mac_address" << robot.getMacAddress()
-                             << "ip" << robot.getIp()
-                             << "port" << static_cast<int>(robot.getPort())  // Ensure type compatibility
-                             << "isAccepted" << robot.isAccepted();
+            document_builder << "name" << robot->getName()
+                             << "mac_address" << robot->getMacAddress()
+                             << "ip" << robot->getIp()
+                             << "port" << static_cast<int>(robot->getPort())  // Ensure type compatibility
+                             << "isAccepted" << robot->isAccepted();
 
             bsoncxx::document::value document_value = document_builder << bsoncxx::builder::stream::finalize;
 

@@ -5,12 +5,22 @@
 #ifndef ROBOT_H
 #define ROBOT_H
 #include <string>
+#include <boost/asio.hpp>
+#include <boost/beast.hpp>
+#include <boost/beast/websocket.hpp>
+#include <iostream>
+#include <boost/asio/steady_timer.hpp>
+#include <utility>
 
+namespace asio = boost::asio;
+namespace beast = boost::beast;
+namespace websocket = beast::websocket;
+using tcp = asio::ip::tcp;
 
 class Robot {
 public:
     // Robot() = default;
-    Robot(std::string db_id, std::string name, std::string mac_address, std::string ip, unsigned char port, bool isAccepted);
+    Robot(websocket::stream<tcp::socket> &robot_websocket, std::string db_id, std::string name, std::string mac_address, std::string ip, unsigned char port, bool isAccepted);
     ~Robot();
 
     std::string getDbId() {return _db_id;}
@@ -21,6 +31,7 @@ public:
     bool isAccepted() const {return _isAccepted;}
 
 private:
+    websocket::stream<tcp::socket> _robot_websocket;
     std::string _db_id;
     std::string _name;
     std::string _mac_address;
