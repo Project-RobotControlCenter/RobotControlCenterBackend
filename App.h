@@ -6,7 +6,18 @@
 #define APP_H
 #include <memory>
 #include <string>
+#include <boost/asio.hpp>
+#include <boost/beast.hpp>
+#include <boost/beast/websocket.hpp>
+#include <iostream>
+#include <boost/asio/steady_timer.hpp>
 
+#include "Session.h"
+
+namespace asio = boost::asio;
+namespace beast = boost::beast;
+namespace websocket = beast::websocket;
+using tcp = asio::ip::tcp;
 
 class App {
 public:
@@ -32,7 +43,11 @@ private:
     std::string _frontend_websocket_port;
     std::string _robots_websocket_port;
 
+    std::vector<std::shared_ptr<Session>> _sessions;
+
     App(int argc, const char * argv[]);
+
+    void onNewFrontendConnection(websocket::stream<tcp::socket> frontend_websocket);
 };
 
 
