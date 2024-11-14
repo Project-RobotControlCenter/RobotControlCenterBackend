@@ -26,7 +26,7 @@ App::App(int argc, const char *argv[])
         std::cout << "INFO : App - RobotManager initialized" << std::endl;
     }
 
-    if(FrontendManager::initInstance(ioc, std::stoi(_frontend_websocket_port))) {
+    if(FrontendManager::initInstance(ioc, std::stoi(_frontend_websocket_port), std::bind(&App::onNewFrontendConnection, this, std::placeholders::_1))) {
         std::cout << "INFO : App - FrontendManager initialized" << std::endl;
     }
 
@@ -35,4 +35,8 @@ App::App(int argc, const char *argv[])
 
 App::~App() {
     std::cout << "DEBUG : App - DESTRUCTOR" << std::endl;
+}
+
+void App::onNewFrontendConnection(websocket::stream<tcp::socket> frontend_websocket) {
+    std::cout << "INFO : App - New frontend connection established" << std::endl;
 }

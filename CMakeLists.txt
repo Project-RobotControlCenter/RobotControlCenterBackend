@@ -21,7 +21,9 @@ add_executable(RobotControlCenterBackend main.cpp
         FrontendRelated/FrontendManager.cpp
         FrontendRelated/FrontendManager.h
         FrontendRelated/FrontendConnectionListener.cpp
-        FrontendRelated/FrontendConnectionListener.h)
+        FrontendRelated/FrontendConnectionListener.h
+        Session.cpp
+        Session.h)
 
 find_package(mongocxx REQUIRED)
 find_package(bsoncxx REQUIRED)
