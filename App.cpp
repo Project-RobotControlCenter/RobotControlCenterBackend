@@ -39,4 +39,6 @@ App::~App() {
 
 void App::onNewFrontendConnection(websocket::stream<tcp::socket> frontend_websocket) {
     std::cout << "INFO : App - New frontend connection established" << std::endl;
+
+    _sessions.emplace_back(std::make_shared<Session>(std::move(frontend_websocket)));
 }

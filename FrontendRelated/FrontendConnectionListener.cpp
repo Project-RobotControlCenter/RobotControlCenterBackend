@@ -98,4 +98,6 @@ void FrontendConnectionListener::on_accept_websocket_connection(beast::error_cod
 
 void FrontendConnectionListener::handle_error(const beast::error_code& ec, const std::string& context) {
     std::cerr << "ERROR : error in " << context << ": " << ec.message() << std::endl;
+
+
 }

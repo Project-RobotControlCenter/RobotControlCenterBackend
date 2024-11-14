@@ -12,6 +12,8 @@
 #include <iostream>
 #include <boost/asio/steady_timer.hpp>
 
+#include "Session.h"
+
 namespace asio = boost::asio;
 namespace beast = boost::beast;
 namespace websocket = beast::websocket;
@@ -40,6 +42,8 @@ private:
     std::string _db_password;
     std::string _frontend_websocket_port;
     std::string _robots_websocket_port;
+
+    std::vector<std::shared_ptr<Session>> _sessions;
 
     App(int argc, const char * argv[]);
 
