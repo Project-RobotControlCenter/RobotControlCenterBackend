@@ -4,8 +4,8 @@
 
 #include "Session.h"
 
-Session::Session(websocket::stream<tcp::socket> frontend_websocket)
-    : _frontend_websocket(std::move(frontend_websocket)) {
+Session::Session(asio::io_context &ioc,websocket::stream<tcp::socket> frontend_websocket)
+    : _ioc(ioc), _frontend_websocket(std::move(frontend_websocket)) {
     std::cout << "INFO : Session - Constructor" << std::endl;
 }
 

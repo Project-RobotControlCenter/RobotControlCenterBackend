@@ -25,9 +25,9 @@ public:
     App& operator=(const App&) = delete;
     ~App();
 
-    static bool initInstance(int argc, const char * argv[]) {
+    static bool initInstance(int argc, const char *argv[], asio::io_context &ioc) {
         if(!_instance) {
-            _instance = std::unique_ptr<App>(new App(argc, argv));
+            _instance = std::unique_ptr<App>(new App(argc, argv, ioc));
         }
         return _instance != nullptr;
     }
@@ -43,9 +43,11 @@ private:
     std::string _frontend_websocket_port;
     std::string _robots_websocket_port;
 
+    asio::io_context & _ioc;
+
     std::vector<std::shared_ptr<Session>> _sessions;
 
-    App(int argc, const char * argv[]);
+    App(int argc, const char *argv[], asio::io_context &ioc);
 
     void onNewFrontendConnection(websocket::stream<tcp::socket> frontend_websocket);
 };

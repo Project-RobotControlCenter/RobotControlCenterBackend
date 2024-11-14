@@ -22,11 +22,12 @@ using tcp = asio::ip::tcp;
 
 class Session {
 public:
-    explicit Session(websocket::stream<tcp::socket> frontend_websocket);
+    Session(asio::io_context &ioc,websocket::stream<tcp::socket> frontend_websocket);
     ~Session();
 
 private:
     websocket::stream<tcp::socket> _frontend_websocket;
+    asio::io_context & _ioc;
 };
 
 
