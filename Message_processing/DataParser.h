@@ -13,6 +13,7 @@
 
 class DataParser{
 public:
+    static std::string getMessageTypeFromJson(const std::string& jsonString);
 
     // FROM JSON TO STRUCT
     static st_getAllRobotsOrder parseJsonToStrucGetAllRobotsOrdert(const std::string& json);

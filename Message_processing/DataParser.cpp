@@ -4,6 +4,25 @@
 
 #include "DataParser.h"
 
+std::string DataParser::getMessageTypeFromJson(const std::string& jsonString) {
+    try {
+        // Parsowanie JSON
+        boost::json::value jsonValue = boost::json::parse(jsonString);
+        const boost::json::object& jsonObject = jsonValue.as_object();
+
+        // Sprawdzanie, czy istnieje pole "message_type" i czy jest typu string
+        if (jsonObject.contains("message_type") && jsonObject.at("message_type").is_string()) {
+            return jsonObject.at("message_type").as_string().c_str();
+        } else {
+            return ""; // Zwracamy pusty ciąg, jeśli "message_type" nie istnieje lub nie jest ciągiem
+        }
+    } catch (const boost::json::system_error& e) {
+        // Obsługa błędu parsowania JSON
+        std::cerr << "Błąd parsowania JSON: " << e.what() << std::endl;
+        return "";
+    }
+}
+
 st_getAllRobotsOrder DataParser::parseJsonToStrucGetAllRobotsOrdert(const std::string &json) {
     // Parsowanie JSON
     boost::json::value jsonValue = boost::json::parse(json);
