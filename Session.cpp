@@ -43,7 +43,7 @@ void Session::initActions() {
         _frontend_websocket.text(true);
         _frontend_websocket.write(asio::buffer(json_response));
 
-        std::cout << "INFO: Sent all robots data response" << std::endl;
+        std::cout << "INFO: Sent all robots data response : " << json_response << "" << std::endl;
     };
 
     _actions["connectToRobot"] = [this]() {
@@ -55,7 +55,8 @@ void Session::initActions() {
 
         std::shared_ptr<Robot> robot = RobotManager::getRobot(order.data.mac_address);
         if (robot) {
-            std::cout << "INFO: Robot with MAC " << order.data.mac_address << " is already connected." << std::endl;
+            // std::cout << "INFO: Robot with MAC " << order.data.mac_address << " is already connected." << std::endl;
+            std::cout << "INFO: Connect session with robot with MAC " << order.data.mac_address << std::endl;
             _robot = robot;
         } else {
             std::cerr << "ERROR: No robot found with MAC address " << order.data.mac_address << std::endl;
