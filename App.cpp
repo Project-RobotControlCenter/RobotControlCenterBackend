@@ -12,11 +12,9 @@
 
 std::unique_ptr<App> App::_instance = nullptr;
 
-App::App(int argc, const char *argv[])
-    : _db_local_ip(argv[1]), _db_local_port(argv[2]), _db_remove_ip(argv[3]), _db_remove_port(argv[4]), _db_password(argv[5]), _frontend_websocket_port(argv[6]), _robots_websocket_port(argv[7]){
+App::App(int argc, const char *argv[], asio::io_context &ioc)
+    : _ioc(ioc), _db_local_ip(argv[1]), _db_local_port(argv[2]), _db_remove_ip(argv[3]), _db_remove_port(argv[4]), _db_password(argv[5]), _frontend_websocket_port(argv[6]), _robots_websocket_port(argv[7]){
     std::cout << "DEBUG : App - CONSTRUCTOR" << std::endl;
-
-    asio::io_context ioc{1};
 
     if(DatabaseManager::initInstance(_db_local_ip, _db_local_port, _db_remove_ip, _db_remove_port, _db_password)) {
         std::cout << "INFO : App - DatabaseManager initialized" << std::endl;
@@ -40,5 +38,6 @@ App::~App() {
 void App::onNewFrontendConnection(websocket::stream<tcp::socket> frontend_websocket) {
     std::cout << "INFO : App - New frontend connection established" << std::endl;
 
-    _sessions.emplace_back(std::make_shared<Session>(std::move(frontend_websocket)));
+    _sessions.emplace_back(std::make_shared<Session>(_ioc, std::move(frontend_websocket)));
+    _sessions.back()->start();
 }

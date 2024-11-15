@@ -35,7 +35,9 @@ int main(int argc, const char * argv[])
         return 1;
     }
 
-    App::initInstance(argc, argv);
+    asio::io_context ioc{1};
+
+    App::initInstance(argc, argv, ioc);
 
     while(run) {
         sleep(2);
