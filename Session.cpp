@@ -11,6 +11,7 @@
 Session::Session(asio::io_context &ioc,websocket::stream<tcp::socket> frontend_websocket)
     : _ioc(ioc), _frontend_websocket(std::move(frontend_websocket)) {
     std::cout << "INFO : Session - Constructor" << std::endl;
+    initActions();
 }
 
 Session::~Session() {
@@ -85,5 +86,12 @@ void Session::handleMessageFromFrontend() {
     std::cout << "INFO : Session - message from frontend : " << message_response << std::endl;
 
     std::string message_type = DataParser::getMessageTypeFromJson(message_response);
+
+    if (_actions.find(message_type) != _actions.end()) {
+        std::cout << "INFO : Session - Action found for message type " << message_type << std::endl;
+        _actions[message_type]();
+    } else {
+        std::cout << "INFO : Session - No action found for message type " << message_type << std::endl;
+    }
 }
 
