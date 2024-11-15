@@ -45,7 +45,7 @@ void Session::initActions() {
         std::cout << "INFO: Sent all robots data response" << std::endl;
     };
 
-    _actions["connectToRobotO"] = [this]() {
+    _actions["connectToRobot"] = [this]() {
         std::cout << "INFO: connectToRobotO action invoked" << std::endl;
 
         std::string message_response = beast::buffers_to_string(_frontend_input_buffer.data());
