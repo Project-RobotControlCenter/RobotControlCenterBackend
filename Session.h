@@ -11,9 +11,11 @@
 #include <boost/beast.hpp>
 #include <boost/beast/websocket.hpp>
 #include <iostream>
+#include <unordered_map>
 #include <boost/asio/steady_timer.hpp>
 
 #include "Session.h"
+#include "Robots/Robot.h"
 
 namespace asio = boost::asio;
 namespace beast = boost::beast;
@@ -28,11 +30,16 @@ public:
     void start();
 
 private:
-    websocket::stream<tcp::socket> _frontend_websocket;
-    asio::io_context & _ioc;
     bool _initialized = false;
+    asio::io_context & _ioc;
 
+    websocket::stream<tcp::socket> _frontend_websocket;
     beast::flat_buffer _frontend_input_buffer;
+
+    std::shared_ptr<Robot> _robot;
+
+    std::unordered_map<std::string, std::function<void()>> _actions;
+    void initActions();
 
     void listenOnFrontend();
     void handleMessageFromFrontend();
