@@ -28,8 +28,21 @@ void Session::start() {
 }
 
 void Session::initActions() {
-    _actions["getAllRobots"] = []() {
+    _actions["getAllRobots"] = [this]() {
+        std::cout << "INFO: getAllRobots action invoked" << std::endl;
 
+        std::vector<st_robotInfo> robots_info = RobotManager::getAllRobotsData();
+
+        st_AllRobotsInfo allRobotsInfo;
+        allRobotsInfo.message_type = "AllRobotsInfo";
+        allRobotsInfo.data.robots_info = std::move(robots_info);
+
+        std::string json_response = DataParser::parseStructToJson(allRobotsInfo);
+
+        _frontend_websocket.text(true);
+        _frontend_websocket.write(asio::buffer(json_response));
+
+        std::cout << "INFO: Sent all robots data response" << std::endl;
     };
 
     _actions["connectToRobotO"] = [this]() {
