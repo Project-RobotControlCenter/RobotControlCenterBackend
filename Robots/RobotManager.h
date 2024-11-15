@@ -15,6 +15,7 @@
 #include <boost/asio/steady_timer.hpp>
 #include <utility>
 
+#include "../Message_processing/MessageStructs.h"
 #include "Robot.h"
 
 namespace asio = boost::asio;
@@ -41,6 +42,8 @@ public:
 
     static std::shared_ptr<Robot> getRobot(const std::string &mac_address) {return getInstance().getRobotImp(mac_address);}
 
+    static std::vector<st_robotInfo> getAllRobotsData() {return getInstance().getAllRobotsDataImp();}
+
 private:
     static std::unique_ptr<RobotManager> _instance;
     asio::io_context &_ioc;
@@ -52,6 +55,8 @@ private:
     std::unordered_map<std::string, std::shared_ptr<Robot>> _robots;
 
     std::shared_ptr<Robot> getRobotImp(const std::string &mac_address);
+
+    std::vector<st_robotInfo> getAllRobotsDataImp();
 };
 
 

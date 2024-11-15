@@ -10,6 +10,7 @@
 #include <thread>
 #include <boost/json.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
+#include "../Message_processing/MessageStructs.h"
 
 
 
@@ -40,6 +41,23 @@ std::shared_ptr<Robot> RobotManager::getRobotImp(const std::string& mac_address)
         }
     }
     return nullptr;
+}
+
+std::vector<st_robotInfo> RobotManager::getAllRobotsDataImp() {std::vector<st_robotInfo> robots_info;
+    for (const auto& pair : _robots) {
+        const std::shared_ptr<Robot>& robot = pair.second;
+        if (robot) {
+            st_robotInfo info;
+            info.mac_address = robot->getMacAddress();
+            info.robot_name = robot->getName();
+            info.robot_ip = robot->getIp();
+            info.robot_port = robot->getPort();
+            robots_info.push_back(info);
+        }
+    }
+
+    return robots_info;
+
 }
 
 void RobotManager::onNewRobotConnection(websocket::stream<tcp::socket> robot_websocket) {
