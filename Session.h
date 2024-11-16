@@ -47,6 +47,9 @@ private:
     void listenOnFrontend();
     void handleMessageFromFrontend();
 
+    void listenOnRobot();
+    void handleMessageFromRobot(const json::value &message);
+
     std::function<void(unsigned int)> _on_session_end;
     void closeSession(const std::string &reason);
 };

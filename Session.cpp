@@ -137,6 +137,26 @@ void Session::handleMessageFromFrontend() {
     }
 }
 
+void Session::listenOnRobot() {
+    _robot->setOnReceivedMessageCallback([this](auto && PH1) { handleMessageFromRobot(std::forward<decltype(PH1)>(PH1)); });
+}
+
+void Session::handleMessageFromRobot(const json::value &message) {
+    std::cout << "INFO : Session - Received message from robot" << std::endl;
+    std::string message_response = json::serialize(message);
+    std::cout << "INFO : Session - message from robot : " << message_response << std::endl;
+
+    std::string message_type = DataParser::getMessageTypeFromJson(message_response);
+
+    if (_actions.find(message_type) != _actions.end()) {
+        std::cout << "INFO : Session - Action found for message type " << message_type << std::endl;
+        std::shared_ptr<Session> session = shared_from_this();
+        _actions[message_type](session);
+    } else {
+        std::cout << "INFO : Session - No action found for message type " << message_type << std::endl;
+    }
+}
+
 void Session::closeSession(const std::string &reason) {
     std::cout << "INFO : Session - Closing session : " << reason << "" << std::endl;
 
