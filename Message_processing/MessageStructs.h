@@ -32,7 +32,21 @@ struct st_getAllRobotsOrder {
     }data;
 };
 
+struct st_disconnectFromRobotOrder {
+    std::string message_type;
+    struct {
+        //
+    }data;
+};
+
 // OUTPUTS
+
+// struct st_SimpleResponse {
+//     std::string message_type;
+//     struct {
+//         //
+//     }data;
+// };
 
 struct st_AllRobotsInfo {
     std::string message_type;

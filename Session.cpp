@@ -72,6 +72,25 @@ void Session::initActions() {
 
         session->_frontend_input_buffer.consume(session->_frontend_input_buffer.size());
     };
+
+    _actions["disconnectFromRobot"] = [](const std::shared_ptr<Session> &session) {
+        std::cout << "INFO: disconnectFromRobot action invoked" << std::endl;
+
+        if(session->_robot) {
+            std::cout << "INFO: Disconnect session with robot with MAC " << session->_robot->getMacAddress() << std::endl;
+            session->_robot.reset();
+
+            session->_frontend_websocket.text(true);
+            session->_frontend_websocket.write(asio::buffer(R"({"message_type":"RobotDisconnected"})"));
+        } else {
+            session->_frontend_websocket.text(true);
+            session->_frontend_websocket.write(asio::buffer(R"({"message_type":"NoRobotConnected"})"));
+
+            std::cerr << "ERROR: No robot connected" << std::endl;
+        }
+
+        session->_frontend_input_buffer.consume(session->_frontend_input_buffer.size());
+    };
 }
 
 void Session::listenOnFrontend() {

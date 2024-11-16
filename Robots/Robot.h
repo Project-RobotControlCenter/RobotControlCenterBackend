@@ -51,7 +51,6 @@ private:
     boost::beast::flat_buffer _buffer;
 
     void onReceive(boost::beast::error_code ec, std::size_t bytes_transferred);
-
 };
 
 

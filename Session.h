@@ -46,8 +46,8 @@ private:
 
     void listenOnFrontend();
     void handleMessageFromFrontend();
-    std::function<void(unsigned int)> _on_session_end;
 
+    std::function<void(unsigned int)> _on_session_end;
     void closeSession(const std::string &reason);
 };
 
