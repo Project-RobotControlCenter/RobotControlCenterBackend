@@ -47,11 +47,13 @@ private:
 
     std::vector<std::shared_ptr<Session>> _sessions;
 
+    unsigned int _session_id_count = 0;
+
     App(int argc, const char *argv[], asio::io_context &ioc);
 
     void onNewFrontendConnection(websocket::stream<tcp::socket> frontend_websocket);
+
+    void onSessionEnd(unsigned int session_id);
 };
-
-
 
 #endif //APP_H

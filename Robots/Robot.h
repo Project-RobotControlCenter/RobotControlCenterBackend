@@ -33,6 +33,7 @@ public:
     bool isAccepted() const {return _isAccepted;}
 
     void sendMessage(const json::value& message);
+    void sendMessage(const beast::flat_buffer::const_buffers_type& buffer);
 
     void setOnReceivedMessageCallback(const std::function<void(const json::value&)> &callback) {_on_received_message_callback = callback;}
 
@@ -51,7 +52,6 @@ private:
     boost::beast::flat_buffer _buffer;
 
     void onReceive(boost::beast::error_code ec, std::size_t bytes_transferred);
-
 };
 
 

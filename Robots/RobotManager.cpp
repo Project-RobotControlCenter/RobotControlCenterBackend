@@ -12,8 +12,6 @@
 #include <bsoncxx/builder/stream/document.hpp>
 #include "../Message_processing/MessageStructs.h"
 
-
-
 std::unique_ptr<RobotManager> RobotManager::_instance = nullptr;
 
 RobotManager::RobotManager(asio::io_context &ioc, unsigned short _robot_connection_port)
