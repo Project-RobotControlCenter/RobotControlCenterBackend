@@ -26,6 +26,19 @@ void Robot::sendMessage(const json::value &message) {
     }
 }
 
+void Robot::sendMessage(const beast::flat_buffer::const_buffers_type& buffer) {
+    try {
+        // Konwersja bufora na string
+        std::string serialized_message(boost::asio::buffer_cast<const char*>(buffer), boost::asio::buffer_size(buffer));
+
+        _robot_websocket.text(true); // Ustawienie trybu wiadomości WebSocket na tekst
+        _robot_websocket.write(boost::asio::buffer(serialized_message));
+        std::cout << "Sent message: " << serialized_message << std::endl;
+    } catch (const boost::system::system_error& se) {
+        std::cerr << "Error while sending message: " << se.what() << std::endl;
+    }
+}
+
 void Robot::startReceivingMessages() {
     _robot_websocket.async_read(
        _buffer,

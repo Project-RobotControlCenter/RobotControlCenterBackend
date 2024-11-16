@@ -128,6 +128,11 @@ void Session::handleMessageFromFrontend() {
 
     std::string message_type = DataParser::getMessageTypeFromJson(message_response);
 
+    if(message_type == "robotControl") {
+        std::cout << "INFO : redirected message from frontend to robot" << std::endl;
+        _robot->sendMessage(_frontend_input_buffer.data());
+    }
+
     if (_actions.find(message_type) != _actions.end()) {
         std::cout << "INFO : Session - Action found for message type " << message_type << std::endl;
         std::shared_ptr<Session> session = shared_from_this();
@@ -147,6 +152,17 @@ void Session::handleMessageFromRobot(const json::value &message) {
     std::cout << "INFO : Session - message from robot : " << message_response << std::endl;
 
     std::string message_type = DataParser::getMessageTypeFromJson(message_response);
+
+    if(message_type == "dataStreamFromRobot") {
+        _frontend_websocket.async_write(asio::buffer(message_response), [this] (beast::error_code ec, std::size_t bytes_transferred) {
+            if(ec) {
+                std::cerr << "ERROR : Session - Error while sending message to frontend: " << ec.message() << std::endl;
+                this->closeSession(ec.message());
+                return;
+            }
+            std::cout << "INFO : redirected message from robot to frontend" << std::endl;
+        });
+    }
 
     if (_actions.find(message_type) != _actions.end()) {
         std::cout << "INFO : Session - Action found for message type " << message_type << std::endl;
