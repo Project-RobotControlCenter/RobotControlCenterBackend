@@ -38,6 +38,24 @@ App::~App() {
 void App::onNewFrontendConnection(websocket::stream<tcp::socket> frontend_websocket) {
     std::cout << "INFO : App - New frontend connection established" << std::endl;
 
-    _sessions.emplace_back(std::make_shared<Session>(_ioc, std::move(frontend_websocket)));
+    _sessions.emplace_back(std::make_shared<Session>(_session_id_count++, _ioc, std::move(frontend_websocket), std::bind(&App::onSessionEnd, this, std::placeholders::_1)));
     _sessions.back()->start();
+
+    if(_session_id_count == UINT32_MAX - 1) {
+        _session_id_count = 0;
+    }
+}
+
+void App::onSessionEnd(const unsigned int session_id) {
+    std::cout << "INFO : App - Session finished" << std::endl;
+
+    // Output number of existing shared_ptr instances for the session before removal
+    _sessions.erase(std::remove_if(_sessions.begin(), _sessions.end(), [session_id](const std::shared_ptr<Session> &session) {
+        if (session->getSessionId() == session_id) {
+            // Print the use_count before removing this session
+            std::cout << "INFO: Number of shared_ptr instances for session before removal: " << session.use_count() << std::endl;
+            return true; // Mark for removal
+        }
+        return false; // Do not remove
+    }), _sessions.end());
 }
