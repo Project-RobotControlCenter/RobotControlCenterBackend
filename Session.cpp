@@ -66,6 +66,12 @@ void Session::initActions() {
             // std::cout << "INFO: Robot with MAC " << order.data.mac_address << " is already connected." << std::endl;
             std::cout << "INFO: Connect session with robot with MAC " << order.data.mac_address << std::endl;
             session->_robot = robot;
+            // TODO: TESTw
+            session->_robot->setOnDisconnectToSessionCallback(std::bind(&Session::handleRobotDisconnected, session));
+            session->_robot->setOnReceivedTextMessageCallback(std::bind(&Session::handleTextMessageFromRobot, session, std::placeholders::_1));
+            session->_robot->setOnReceivedBinaryMessageCallback(std::bind(&Session::handleBinaryMessageFromRobot, session, std::placeholders::_1));
+            //
+            session->_robot->startReceivingMessages();
         } else {
             std::cerr << "ERROR: No robot found with MAC address " << order.data.mac_address << std::endl;
         }
@@ -113,7 +119,7 @@ void Session::listenOnFrontend() {
             this->listenOnFrontend();
             return;
         }
-        this->handleMessageFromFrontend();
+        this->handleTextMessageFromFrontend();
         this->_frontend_input_buffer.consume(this->_frontend_input_buffer.size());
 
         //Repeat
@@ -121,7 +127,7 @@ void Session::listenOnFrontend() {
     });
 }
 
-void Session::handleMessageFromFrontend() {
+void Session::handleTextMessageFromFrontend() {
     std::cout << "INFO : Session - Received message from frontend" << std::endl;
     std::string message_response = beast::buffers_to_string(_frontend_input_buffer.data());
     std::cout << "INFO : Session - message from frontend : " << message_response << std::endl;
@@ -131,45 +137,76 @@ void Session::handleMessageFromFrontend() {
     if(message_type == "robotControl") {
         std::cout << "INFO : redirected message from frontend to robot" << std::endl;
         _robot->sendMessage(_frontend_input_buffer.data());
+        return;
     }
 
     if (_actions.find(message_type) != _actions.end()) {
         std::cout << "INFO : Session - Action found for message type " << message_type << std::endl;
         std::shared_ptr<Session> session = shared_from_this();
         _actions[message_type](session);
-    } else {
-        std::cout << "INFO : Session - No action found for message type " << message_type << std::endl;
+        return;
     }
+
+    std::cout << "INFO : Session - No action found for message type " << message_type << std::endl;
 }
 
-void Session::listenOnRobot() {
-    _robot->setOnReceivedMessageCallback([this](auto && PH1) { handleMessageFromRobot(std::forward<decltype(PH1)>(PH1)); });
-}
+// void Session::listenOnRobot() {
+//     _robot->setOnReceivedTextMessageCallback(std::bind(&Session::handleMessageFromRobot, this, std::placeholders::_1));
+// }
 
-void Session::handleMessageFromRobot(const json::value &message) {
+void Session::handleTextMessageFromRobot(const json::value &message) {
     std::cout << "INFO : Session - Received message from robot" << std::endl;
     std::string message_response = json::serialize(message);
     std::cout << "INFO : Session - message from robot : " << message_response << std::endl;
 
+    _frontend_websocket.binary(false);
+
     std::string message_type = DataParser::getMessageTypeFromJson(message_response);
 
-    if(message_type == "dataStreamFromRobot") {
-        _frontend_websocket.async_write(asio::buffer(message_response), [this] (beast::error_code ec, std::size_t bytes_transferred) {
+    // if(message_type == "dataStreamFromRobot") {
+    //     _frontend_websocket.async_write(asio::buffer(message_response), [this] (beast::error_code ec, std::size_t bytes_transferred) {
+    //         if(ec) {
+    //             std::cerr << "ERROR : Session - Error while sending message to frontend: " << ec.message() << std::endl;
+    //             this->closeSession(ec.message());
+    //             return;
+    //         }
+    //         std::cout << "INFO : redirected message from robot to frontend" << std::endl;
+    //     });
+    // }
+
+    if (_actions.find(message_type) != _actions.end()) {
+        std::cout << "INFO : Session - Action found for message type " << message_type << std::endl;
+        std::shared_ptr<Session> session = shared_from_this();
+        _actions[message_type](session);
+        return;
+    }
+
+    std::cout << "INFO : Session - No action found for message type " << message_type << std::endl;
+}
+
+void Session::handleBinaryMessageFromRobot(const asio::streambuf &buffer) {
+    _frontend_websocket.binary(true);
+
+    auto buffers = buffer.data();
+
+    _frontend_websocket.async_write(buffers, [this] (beast::error_code ec, std::size_t bytes_transferred) {
             if(ec) {
-                std::cerr << "ERROR : Session - Error while sending message to frontend: " << ec.message() << std::endl;
+                std::cerr << "ERROR : Session - Error while sending binary message to frontend: " << ec.message() << std::endl;
                 this->closeSession(ec.message());
                 return;
             }
             std::cout << "INFO : redirected message from robot to frontend" << std::endl;
         });
-    }
+}
 
-    if (_actions.find(message_type) != _actions.end()) {
-        std::cout << "INFO : Session - Action found for message type " << message_type << std::endl;
-        std::shared_ptr<Session> session = shared_from_this();
-        _actions[message_type](session);
-    } else {
-        std::cout << "INFO : Session - No action found for message type " << message_type << std::endl;
+void Session::handleRobotDisconnected() {
+    std::cout << "INFO : Session - Robot disconnected" << std::endl;
+
+    if(_robot) {
+        _robot->setOnDisconnectToSessionCallback(nullptr);
+        _robot->setOnReceivedTextMessageCallback(nullptr);
+        _robot.reset();
+        _robot = nullptr;
     }
 }
 

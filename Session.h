@@ -45,10 +45,12 @@ private:
     void initActions();
 
     void listenOnFrontend();
-    void handleMessageFromFrontend();
+    void handleTextMessageFromFrontend();
 
-    void listenOnRobot();
-    void handleMessageFromRobot(const json::value &message);
+    // void listenOnRobot();
+    void handleTextMessageFromRobot(const json::value &message);
+    void handleBinaryMessageFromRobot(const asio::streambuf &buffer);
+    void handleRobotDisconnected();
 
     std::function<void(unsigned int)> _on_session_end;
     void closeSession(const std::string &reason);
