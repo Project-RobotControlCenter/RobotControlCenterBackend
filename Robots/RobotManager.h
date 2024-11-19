@@ -42,7 +42,7 @@ public:
 
     static std::shared_ptr<Robot> getRobot(const std::string &mac_address) {return getInstance().getRobotImp(mac_address);}
 
-    static std::vector<st_robotInfo> getAllRobotsData() {return getInstance().getAllRobotsDataImp();}
+    static std::vector<st_robotInfo> getAllRobotsData() {return std::move(getInstance().getAllRobotsDataImp());}
 
 private:
     static std::unique_ptr<RobotManager> _instance;
@@ -51,6 +51,7 @@ private:
     RobotManager(asio::io_context &ioc, unsigned short _robot_connection_port);
 
     void onNewRobotConnection(websocket::stream<tcp::socket> robot_websocket);
+    void onRobotDisconnected(const std::string &mac_address);
 
     std::unordered_map<std::string, std::shared_ptr<Robot>> _robots;
 

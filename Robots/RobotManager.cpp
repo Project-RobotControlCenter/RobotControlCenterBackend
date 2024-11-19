@@ -142,7 +142,7 @@ void RobotManager::onNewRobotConnection(websocket::stream<tcp::socket> robot_web
 
             //Add to _robots
             std::cout << "Add robot" << std::endl;
-            auto result = _robots.emplace(mac_address, std::make_shared<Robot>(robot_websocket, _ioc, "", internal_robot_name, mac_address, ip, port, false));
+            auto result = _robots.emplace(mac_address, std::make_shared<Robot>(robot_websocket, _ioc, "", internal_robot_name, mac_address, ip, port, false, [this](auto && PH1) { onRobotDisconnected(std::forward<decltype(PH1)>(PH1)); }));
             if (!result.second) {
                 std::cerr << "ERROR: Robot with MAC address " << mac_address << " already exists or failed to add." << std::endl;
                 return; // Handle the error case appropriately
@@ -177,5 +177,12 @@ void RobotManager::onNewRobotConnection(websocket::stream<tcp::socket> robot_web
     } catch (const std::exception &e) {
         std::cerr << "ERROR : Exception in RobotManager::onNewRobotConnection: " << e.what() << std::endl;
         return;
+    }
+}
+
+void RobotManager::onRobotDisconnected(const std::string &mac_address) {
+    const auto it = _robots.find(mac_address);
+    if (it != _robots.end()) {
+        _robots.erase(it);
     }
 }

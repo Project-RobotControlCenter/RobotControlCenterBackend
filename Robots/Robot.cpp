@@ -6,13 +6,14 @@
 
 #include <utility>
 
-Robot::Robot(websocket::stream<tcp::socket> &robot_websocket, asio::io_context& ioc, std::string db_id, std::string name, std::string mac_address, std::string ip, unsigned char port, bool isAccepted)
-    : _robot_websocket(std::move(robot_websocket)), _ioc(ioc), _db_id(std::move(db_id)), _name(std::move(name)), _mac_address(std::move(mac_address)), _ip(std::move(ip)), _port(port), _isAccepted(isAccepted)
+Robot::Robot(websocket::stream<tcp::socket> &robot_websocket, asio::io_context& ioc, std::string db_id, std::string name, std::string mac_address, std::string ip, unsigned char port, bool isAccepted, const std::function<void(const std::string&)> &on_disconnect_to_manager_callback)
+    : _robot_websocket(std::move(robot_websocket)), _ioc(ioc), _db_id(std::move(db_id)), _name(std::move(name)), _mac_address(std::move(mac_address)), _ip(std::move(ip)), _port(port), _isAccepted(isAccepted), _on_disconnect_to_manager_callback(on_disconnect_to_manager_callback)
 {
-
+    std::cout << "INFO : ROBOT - Constructor" << std::endl;
 }
 
 Robot::~Robot() {
+    std::cout << "INFO : ROBOT - Destructor" << std::endl;
 }
 
 void Robot::sendMessage(const json::value &message) {
@@ -40,30 +41,57 @@ void Robot::sendMessage(const beast::flat_buffer::const_buffers_type& buffer) {
 }
 
 void Robot::startReceivingMessages() {
+    std::cout << "INFO : Robot - Starting to receive messages" << std::endl;
     _robot_websocket.async_read(
        _buffer,
        [this](boost::beast::error_code ec, std::size_t bytes_transferred) {
+           std::cout << "INFO : Robot - Received message" << std::endl;
            onReceive(ec, bytes_transferred);
        });
-    _ioc.run();
 }
 
 void Robot::onReceive(boost::beast::error_code ec, std::size_t bytes_transferred) {
     if (ec) {
-        std::cerr << "ERROR :Error while receiving message: " << ec.message() << std::endl;
+        std::cerr << "ERROR : Error while receiving message: " << ec.message() << std::endl;
+
+        if(ec == websocket::error::closed) {
+            std::cout << "INFO : Robot - WebSocket connection closed" << std::endl;
+            _on_disconnect_to_manager_callback(_mac_address);
+            if(_on_disconnect_to_session_callback) _on_disconnect_to_session_callback();
+            return;
+        }
+
+        if(ec == boost::asio::error::operation_aborted) {
+            std::cout << "INFO : Robot - WebSocket operation aborted" << std::endl;
+            _on_disconnect_to_manager_callback(_mac_address);
+            if(_on_disconnect_to_session_callback) _on_disconnect_to_session_callback();
+            return;
+        }
+
         return;
     }
 
     try {
-        std::string receivedMessage = boost::beast::buffers_to_string(_buffer.data());
-        _buffer.consume(_buffer.size()); // Clear the buffer after reading
+        if(_robot_websocket.got_text()) {
+            //TEXT DATA
 
-        json::value parsed_message = json::parse(receivedMessage);
-        std::cout << "Received message: " << receivedMessage << std::endl;
+            std::string receivedMessage = boost::beast::buffers_to_string(_buffer.data());
+            _buffer.consume(_buffer.size()); // Clear the buffer after reading
 
-        // Trigger the callback if set
-        if (_on_received_message_callback) {
-            _on_received_message_callback(parsed_message);
+            json::value parsed_message = json::parse(receivedMessage);
+            std::cout << "Received message: " << receivedMessage << std::endl;
+
+            // Trigger the callback if set
+            if (_on_received_text_message_callback) {
+                _on_received_text_message_callback(parsed_message);
+            }
+        }else {
+            //BINARY DATA
+            if(_on_received_binary_message_callback) {
+                _on_received_binary_message_callback(_buffer);
+            }
+
+            _buffer.consume(_buffer.size());
         }
     } catch (const json::system_error& je) {
         std::cerr << "ERROR : Error parsing JSON message: " << je.what() << std::endl;
