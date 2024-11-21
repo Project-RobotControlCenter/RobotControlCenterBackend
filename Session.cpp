@@ -21,9 +21,7 @@ Session::~Session() {
         _frontend_websocket.close(websocket::close_code::normal);
     }
 
-    if (_robot) {
-        _robot.reset();
-    }
+    releaseRobot();
 }
 
 void Session::start() {
@@ -84,7 +82,7 @@ void Session::initActions() {
 
         if(session->_robot) {
             std::cout << "INFO: Disconnect session with robot with MAC " << session->_robot->getMacAddress() << std::endl;
-            session->_robot.reset();
+            session->releaseRobot();
 
             session->_frontend_websocket.text(true);
             session->_frontend_websocket.write(asio::buffer(R"({"message_type":"RobotDisconnected"})"));
@@ -184,7 +182,9 @@ void Session::handleTextMessageFromRobot(const json::value &message) {
     std::cout << "INFO : Session - No action found for message type " << message_type << std::endl;
 }
 
-void Session::handleBinaryMessageFromRobot(const asio::streambuf &buffer) {
+void Session::handleBinaryMessageFromRobot(const beast::flat_buffer &buffer) {
+    std::cout << "Session::handleBinaryMessageFromRobot()" << std::endl;
+
     _frontend_websocket.binary(true);
 
     auto buffers = buffer.data();
@@ -201,18 +201,27 @@ void Session::handleBinaryMessageFromRobot(const asio::streambuf &buffer) {
 
 void Session::handleRobotDisconnected() {
     std::cout << "INFO : Session - Robot disconnected" << std::endl;
-
-    if(_robot) {
-        _robot->setOnDisconnectToSessionCallback(nullptr);
-        _robot->setOnReceivedTextMessageCallback(nullptr);
-        _robot.reset();
-        _robot = nullptr;
-    }
+    releaseRobot();
 }
 
 void Session::closeSession(const std::string &reason) {
     std::cout << "INFO : Session - Closing session : " << reason << "" << std::endl;
 
+    releaseRobot();
+
     this->_on_session_end(_session_id);
+}
+
+void Session::releaseRobot() {
+    std::cout << "INFO : Session::releaseRobot()" << std::endl;
+
+    if(_robot) {
+        _robot->stopReceivingMessages();
+        _robot->setOnDisconnectToSessionCallback(nullptr);
+        _robot->setOnReceivedTextMessageCallback(nullptr);
+        _robot->setOnReceivedBinaryMessageCallback(nullptr);
+        _robot.reset();
+        _robot = nullptr;
+    }
 }
 

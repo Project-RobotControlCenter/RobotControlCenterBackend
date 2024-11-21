@@ -40,7 +40,7 @@ void Robot::sendMessage(const beast::flat_buffer::const_buffers_type& buffer) {
     }
 }
 
-void Robot::startReceivingMessages() {
+void Robot::startReceivingMessagesImp() {
     std::cout << "INFO : Robot - Starting to receive messages" << std::endl;
     _robot_websocket.async_read(
        _buffer,
@@ -58,6 +58,7 @@ void Robot::onReceive(boost::beast::error_code ec, std::size_t bytes_transferred
             std::cout << "INFO : Robot - WebSocket connection closed" << std::endl;
             _on_disconnect_to_manager_callback(_mac_address);
             if(_on_disconnect_to_session_callback) _on_disconnect_to_session_callback();
+            _readMessages = false;
             return;
         }
 
@@ -65,6 +66,7 @@ void Robot::onReceive(boost::beast::error_code ec, std::size_t bytes_transferred
             std::cout << "INFO : Robot - WebSocket operation aborted" << std::endl;
             _on_disconnect_to_manager_callback(_mac_address);
             if(_on_disconnect_to_session_callback) _on_disconnect_to_session_callback();
+            _readMessages = false;
             return;
         }
 
@@ -98,5 +100,7 @@ void Robot::onReceive(boost::beast::error_code ec, std::size_t bytes_transferred
     }
 
     // Continue receiving messages asynchronously
-    startReceivingMessages();
+    if(_readMessages) {
+        startReceivingMessages();
+    }
 }

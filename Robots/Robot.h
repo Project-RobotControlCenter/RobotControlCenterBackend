@@ -38,10 +38,15 @@ public:
     void sendMessage(const beast::flat_buffer::const_buffers_type& buffer);
 
     void setOnReceivedTextMessageCallback(const std::function<void(const json::value&)> &callback) {_on_received_text_message_callback = callback;}
-    void setOnReceivedBinaryMessageCallback(const std::function<void(asio::streambuf&)> &callback) {_on_received_binary_message_callback = callback;}
+    void setOnReceivedBinaryMessageCallback(const std::function<void(beast::flat_buffer&)> &callback) {_on_received_binary_message_callback = callback;}
     void setOnDisconnectToSessionCallback(const std::function<void(void)> &callback) {_on_disconnect_to_session_callback = callback;}
 
-    void startReceivingMessages();
+    void startReceivingMessages() {
+        _readMessages = true;
+        startReceivingMessagesImp();
+    };
+
+    void stopReceivingMessages() {_readMessages = false;}
 
 private:
     websocket::stream<tcp::socket> _robot_websocket;
@@ -52,14 +57,16 @@ private:
     std::string _ip;
     unsigned char _port;
     bool _isAccepted = false;
+    bool _readMessages = false;
     std::function<void(const json::value&)> _on_received_text_message_callback;
-    std::function<void(asio::streambuf&)> _on_received_binary_message_callback;
+    std::function<void(beast::flat_buffer&)> _on_received_binary_message_callback;
     std::function<void(const std::string&)> _on_disconnect_to_manager_callback;
     std::function<void(void)> _on_disconnect_to_session_callback;
-    // boost::beast::flat_buffer _buffer;
-    asio::streambuf _buffer;
+    beast::flat_buffer _buffer;
+    // asio::streambuf _buffer;
 
     void onReceive(boost::beast::error_code ec, std::size_t bytes_transferred);
+    void startReceivingMessagesImp();
 };
 
 

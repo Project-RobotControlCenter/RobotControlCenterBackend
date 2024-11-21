@@ -49,11 +49,12 @@ private:
 
     // void listenOnRobot();
     void handleTextMessageFromRobot(const json::value &message);
-    void handleBinaryMessageFromRobot(const asio::streambuf &buffer);
+    void handleBinaryMessageFromRobot(const beast::flat_buffer &buffer);
     void handleRobotDisconnected();
 
     std::function<void(unsigned int)> _on_session_end;
     void closeSession(const std::string &reason);
+    void releaseRobot();
 };
 
 
