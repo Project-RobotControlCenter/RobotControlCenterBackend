@@ -27,8 +27,6 @@ App::App(int argc, const char *argv[], asio::io_context &ioc)
     if(FrontendManager::initInstance(ioc, std::stoi(_frontend_websocket_port), std::bind(&App::onNewFrontendConnection, this, std::placeholders::_1))) {
         std::cout << "INFO : App - FrontendManager initialized" << std::endl;
     }
-
-    ioc.run();
 }
 
 App::~App() {

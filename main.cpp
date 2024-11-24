@@ -38,9 +38,15 @@ int main(int argc, const char * argv[])
     asio::io_context ioc{1};
 
     App::initInstance(argc, argv, ioc);
+    //std::thread io_thread([&ioc]() { ioc.run(); });
 
+    std::cout << "INFO : RobotControlCenterBackend - RUNNING" << std::endl;
+    ioc.run();
+
+    // std::cout << "INFO : RobotControlCenterBackend - WHILE" << std::endl;
     while(run) {
         sleep(2);
+        std::cout << "INFO : RobotControlCenterBackend - main while" << std::endl;
     }
 
     std::cout << "INFO : RobotControlCenterBackend - END" << std::endl;
