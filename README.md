@@ -150,7 +150,9 @@ The backend uses structured JSON messages for communication between components. 
     {
         "message_type": "robotControl",
         "data": {
-            // Command-specific details
+            "left_motor_speed": number,
+            "right_motor_speed": number,
+            "auto_stop": true
         }
     }
     ```
