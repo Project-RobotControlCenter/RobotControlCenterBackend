@@ -1,6 +1,6 @@
 # RobotControlCenterBackend
 
-**Robot Control Center Backend** is the backend of the **Robot Control Center** project. As the name suggests, this program facilitates the management of connections between the frontend, robots, and a database (MongoDB). It allows seamless communication between multiple frontends, robots, and provides essential data storage functionalities.
+**Robot Control Center Backend** is the backend for the **Robot Control Center** project. This program facilitates managing connections between the frontend, robots, and a MongoDB database, enabling seamless communication and persistent storage functionalities.
 
 ## Table of Contents
 1. [Introduction](#introduction)
@@ -8,28 +8,35 @@
 3. [Installation](#installation)
 4. [Usage](#usage)
 5. [Configuration](#configuration)
-6. [Contributing](#contributing)
-7. [License](#license)
+6. [JSON Structures](#json-structures)
+7. [Communication Flows](#communication-flows)
+8. [License](#license)
+
+---
 
 ## Introduction
 
-The **Robot Control Center Backend** is designed to serve as the communication bridge between different components of the **Robot Control Center** project. It manages the connections between multiple **frontend clients**, **robots**, and the **database (MongoDB)**. The backend is responsible for handling robot registrations, frontend sessions, and facilitating data exchange between the robots and the frontend.
+The **Robot Control Center Backend** serves as a communication bridge for the **Robot Control Center** project. It manages connections between **frontend clients**, **robots**, and the **database (MongoDB)**. The backend handles robot registrations, frontend sessions, and facilitates data exchange between these entities.
+
+---
 
 ## Features
-- **Frontend to Robot Connectivity**: Seamlessly connect the frontend to any connected robot.
-- **Automatic Robot Management**: Automatically registers new robots in the database and manages robot connection details, such as robot name, MAC address, and IP.
-- **Automatic Frontend Management**: Handles frontend connection management and session control, including robot access for each session.
-- **Data Transfer**: Allows data transfer between the frontend and connected robots.
-- **MongoDB Integration**: Stores essential robot and session data in a MongoDB database for persistent storage.
+- **Frontend to Robot Connectivity**: Enables direct interaction between the frontend and connected robots.
+- **Automatic Robot Management**: Registers new robots in the database and manages connection details (e.g., name, MAC address, IP).
+- **Session Management**: Handles frontend connections and assigns robots to sessions.
+- **Data Exchange**: Facilitates communication and data transfer between the frontend and robots.
+- **Persistent Storage**: Stores robot and session data in a MongoDB database.
+
+---
 
 ## Installation
 
 ### Prerequisites
-Before running the backend, ensure the following dependencies are installed:
-
+Ensure the following dependencies are installed:
 - **C++14** or higher
 - **Boost.Beast 1.85** or higher (for WebSocket communication)
 - **CMake 3.29** or higher (for building the project)
+- **MongoDB** (for data storage)
 
 ### Steps
 1. **Clone the repository**:
@@ -39,7 +46,7 @@ Before running the backend, ensure the following dependencies are installed:
     ```
 
 2. **Install dependencies**:
-    Follow the instructions for your platform to install Boost and CMake.
+    Install Boost and CMake according to your platform's instructions.
 
 3. **Build the project**:
     ```bash
@@ -50,62 +57,41 @@ Before running the backend, ensure the following dependencies are installed:
     ```
 
 4. **Start MongoDB**:
-    Ensure that your MongoDB database is running locally or remotely. The backend requires MongoDB for session and robot data storage.
+    Ensure your MongoDB instance is running locally or remotely.
 
-5. **Start the Backend**:
-    Run the following command to start the backend:
+5. **Run the backend**:
     ```bash
     ./robot_backend <local_db_ip> <local_db_port> <network_db_ip> <network_db_port> <db_password> <frontend_port> <robot_port>
     ```
+    Replace placeholders with appropriate values.
 
-    Replace the placeholders with the appropriate values for your setup:
-    - `<local_db_ip>`: IP address of your local MongoDB instance.
-    - `<local_db_port>`: MongoDB local port (default: 27017).
-    - `<network_db_ip>`: IP address of the network MongoDB instance.
-    - `<network_db_port>`: MongoDB network port.
-    - `<db_password>`: MongoDB database password.
-    - `<frontend_port>`: Port for frontend connections (e.g., 8080).
-    - `<robot_port>`: Port for robot connections (e.g., 9090).
-
-Now, the backend is ready to manage robot and frontend connections.
+---
 
 ## Usage
 
-Once the backend is running, **robots** and **frontends** can connect to it via their respective ports.
+Once the backend is running:
+- **Robots**: Automatically register upon connection. Robot data is stored in MongoDB.
+- **Frontends**: Connect to the backend and manage sessions to interact with robots.
 
-- **Robots**: Upon connection, robots will automatically register with the backend, and their data (such as name, IP, and MAC address) will be stored in MongoDB.
-- **Frontends**: Frontend clients can connect and establish sessions, allowing them to interact with the connected robots.
+---
 
 ## Configuration
 
-- **Firewall and Ports**: Ensure the necessary ports are open to allow communication between the backend, robots, and frontends. You may need to adjust your firewall settings to allow traffic on:
-  - Frontend connection port
-  - Robot connection port
-- **MongoDB Configuration**: Ensure MongoDB is configured correctly, with the necessary access rights and authentication enabled.
-
-## Contributing
-
-This project is a simple college project, and further development beyond the required features is uncertain. However, if you'd like to contribute or suggest improvements, please feel free to fork the repository and create a pull request.
-
-Here are some ways you can contribute:
-- **Bug Fixes**: Help in identifying and fixing bugs.
-- **Features**: Suggest and develop new features.
-- **Documentation**: Improve the documentation for better clarity.
+- **Ports**:
+  - Ensure ports for frontend and robot connections are open.
+  - Adjust firewall settings if necessary.
+- **MongoDB**:
+  - Configure MongoDB access with proper authentication.
 
 ---
 
 ## JSON Structures
 
-The backend and its components communicate using various JSON messages. Below is a comprehensive list of the JSON structures used, along with their purpose and direction of communication.
+The backend uses structured JSON messages for communication between components. Below are the key message formats:
 
----
-
-## JSON Messages Overview
-
-### 1. **`getAllRobots`**
-- **Description**: Request to fetch all connected robots.
-- **Used in**: Communication between the frontend and the `Session` module.
-- **Structure**:
+### `getAllRobots`
+- **Description**: Fetch data for all connected robots.
+- **Request**:
     ```json
     {
         "message_type": "getAllRobots",
@@ -129,10 +115,9 @@ The backend and its components communicate using various JSON messages. Below is
     }
     ```
 
-### 2. **`connectToRobot`**
-- **Description**: Command to connect a session to a robot by MAC address.
-- **Used in**: Communication between the frontend and the `Session` module.
-- **Structure**:
+### `connectToRobot`
+- **Description**: Connect a session to a specific robot by MAC address.
+- **Request**:
     ```json
     {
         "message_type": "connectToRobot",
@@ -142,17 +127,15 @@ The backend and its components communicate using various JSON messages. Below is
     }
     ```
 
-### 3. **`disconnectFromRobot`**
-- **Description**: Command to disconnect a session from the currently connected robot.
-- **Used in**: Communication between the frontend and the `Session` module.
-- **Structure**:
+### `disconnectFromRobot`
+- **Description**: Disconnect the session from its current robot.
+- **Request**:
     ```json
     {
         "message_type": "disconnectFromRobot",
         "data": {}
     }
     ```
-
 - **Response when no robot is connected**:
     ```json
     {
@@ -160,10 +143,9 @@ The backend and its components communicate using various JSON messages. Below is
     }
     ```
 
-### 4. **`robotControl`**
-- **Description**: Forwarded messages from the frontend to a connected robot for control commands.
-- **Used in**: Communication between the frontend, `Session`, and `Robot` modules.
-- **Structure**:
+### `robotControl`
+- **Description**: Forward control commands from the frontend to a robot.
+- **Request**:
     ```json
     {
         "message_type": "robotControl",
@@ -178,75 +160,21 @@ The backend and its components communicate using various JSON messages. Below is
 ## Communication Flows
 
 ### Frontend ↔ Session
-- **Purpose**: The frontend interacts with the session to manage robot connections and fetch robot data.
+- **Purpose**: Manage robot connections and retrieve robot data.
 - **Messages**: `getAllRobots`, `connectToRobot`, `disconnectFromRobot`, `robotControl`.
 
 ### Session ↔ Robot
-- **Purpose**: The session forwards commands and relays data between the frontend and the connected robot.
-- **Messages**: Parsed messages from the frontend are sent to the `Robot` in text or binary format.
+- **Purpose**: Forward control commands to robots and relay their responses.
+- **Messages**: Text and binary messages are parsed and forwarded as needed.
 
 ### Robot ↔ Database
-- **Purpose**: The robot manager interacts with the database to retrieve or store robot-related information (e.g., MAC address, IP, and state).
-- **Messages**: BSON queries, not strictly JSON, used for MongoDB interactions.
+- **Purpose**: Store and retrieve robot data (e.g., MAC address, IP).
+- **Messages**: BSON queries used for MongoDB interactions.
 
 ---
 
-## Serialization/Deserialization
-
-### Parsing JSON to Structures
-- **Parsing Functions**: Located in `DataParser.cpp`.
-- **Examples**:
-    - Parsing `connectToRobot`:
-        ```cpp
-        st_connectToRobotOrder order = DataParser::parseJsonToStructConnectToRobotOrder(jsonString);
-        ```
-    - Parsing `getAllRobots`:
-        ```cpp
-        st_getAllRobotsOrder order = DataParser::parseJsonToStrucGetAllRobotsOrdert(jsonString);
-        ```
-
-### Generating JSON from Structures
-- **Serialization Functions**: Located in `DataParser.cpp`.
-- **Example**:
-    - Generating response for `getAllRobots`:
-        ```cpp
-        std::string json_response = DataParser::parseStructToJson(allRobotsInfo);
-        ```
-
 ---
-
-## Key Components Involved
-
-1. **RobotManager**:
-    - Handles robot connections and database integration.
-    - **JSON Example**: Initial handshake with robots to fetch `robot_info`.
-
-2. **RobotConnectionListener**:
-    - Listens for new connections and initializes robot sessions.
-
-3. **Session**:
-    - Manages communication between the frontend and robots.
-    - Uses JSON for commands and responses.
-
-4. **DataParser**:
-    - Parses JSON strings into C++ structures and vice versa.
-
----
-
-## Additional Notes
-
-- The `MessageStructs.h` file defines C++ structures corresponding to the JSON messages.
-- Boost JSON is used for parsing and serializing JSON data.
-
-
-### How to Contribute
-1. Fork the repository.
-2. Create a new branch for your feature (`git checkout -b feature/your-feature`).
-3. Commit your changes (`git commit -am 'Add new feature'`).
-4. Push to the branch (`git push origin feature/your-feature`).
-5. Create a new Pull Request.
 
 ## License
 
 This project is licensed under the **3-Clause BSD License**.
-
