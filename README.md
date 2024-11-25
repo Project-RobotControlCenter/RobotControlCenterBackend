@@ -92,6 +92,153 @@ Here are some ways you can contribute:
 - **Features**: Suggest and develop new features.
 - **Documentation**: Improve the documentation for better clarity.
 
+---
+
+## JSON Structures
+
+The backend and its components communicate using various JSON messages. Below is a comprehensive list of the JSON structures used, along with their purpose and direction of communication.
+
+---
+
+## JSON Messages Overview
+
+### 1. **`getAllRobots`**
+- **Description**: Request to fetch all connected robots.
+- **Used in**: Communication between the frontend and the `Session` module.
+- **Structure**:
+    ```json
+    {
+        "message_type": "getAllRobots",
+        "data": {}
+    }
+    ```
+- **Response**:
+    ```json
+    {
+        "message_type": "AllRobotsInfo",
+        "data": {
+            "robots_info": [
+                {
+                    "mac_address": "string",
+                    "robot_name": "string",
+                    "robot_ip": "string",
+                    "robot_port": "number"
+                }
+            ]
+        }
+    }
+    ```
+
+### 2. **`connectToRobot`**
+- **Description**: Command to connect a session to a robot by MAC address.
+- **Used in**: Communication between the frontend and the `Session` module.
+- **Structure**:
+    ```json
+    {
+        "message_type": "connectToRobot",
+        "data": {
+            "mac_address": "string"
+        }
+    }
+    ```
+
+### 3. **`disconnectFromRobot`**
+- **Description**: Command to disconnect a session from the currently connected robot.
+- **Used in**: Communication between the frontend and the `Session` module.
+- **Structure**:
+    ```json
+    {
+        "message_type": "disconnectFromRobot",
+        "data": {}
+    }
+    ```
+
+- **Response when no robot is connected**:
+    ```json
+    {
+        "message_type": "NoRobotConnected"
+    }
+    ```
+
+### 4. **`robotControl`**
+- **Description**: Forwarded messages from the frontend to a connected robot for control commands.
+- **Used in**: Communication between the frontend, `Session`, and `Robot` modules.
+- **Structure**:
+    ```json
+    {
+        "message_type": "robotControl",
+        "data": {
+            // Command-specific details
+        }
+    }
+    ```
+
+---
+
+## Communication Flows
+
+### Frontend ↔ Session
+- **Purpose**: The frontend interacts with the session to manage robot connections and fetch robot data.
+- **Messages**: `getAllRobots`, `connectToRobot`, `disconnectFromRobot`, `robotControl`.
+
+### Session ↔ Robot
+- **Purpose**: The session forwards commands and relays data between the frontend and the connected robot.
+- **Messages**: Parsed messages from the frontend are sent to the `Robot` in text or binary format.
+
+### Robot ↔ Database
+- **Purpose**: The robot manager interacts with the database to retrieve or store robot-related information (e.g., MAC address, IP, and state).
+- **Messages**: BSON queries, not strictly JSON, used for MongoDB interactions.
+
+---
+
+## Serialization/Deserialization
+
+### Parsing JSON to Structures
+- **Parsing Functions**: Located in `DataParser.cpp`.
+- **Examples**:
+    - Parsing `connectToRobot`:
+        ```cpp
+        st_connectToRobotOrder order = DataParser::parseJsonToStructConnectToRobotOrder(jsonString);
+        ```
+    - Parsing `getAllRobots`:
+        ```cpp
+        st_getAllRobotsOrder order = DataParser::parseJsonToStrucGetAllRobotsOrdert(jsonString);
+        ```
+
+### Generating JSON from Structures
+- **Serialization Functions**: Located in `DataParser.cpp`.
+- **Example**:
+    - Generating response for `getAllRobots`:
+        ```cpp
+        std::string json_response = DataParser::parseStructToJson(allRobotsInfo);
+        ```
+
+---
+
+## Key Components Involved
+
+1. **RobotManager**:
+    - Handles robot connections and database integration.
+    - **JSON Example**: Initial handshake with robots to fetch `robot_info`.
+
+2. **RobotConnectionListener**:
+    - Listens for new connections and initializes robot sessions.
+
+3. **Session**:
+    - Manages communication between the frontend and robots.
+    - Uses JSON for commands and responses.
+
+4. **DataParser**:
+    - Parses JSON strings into C++ structures and vice versa.
+
+---
+
+## Additional Notes
+
+- The `MessageStructs.h` file defines C++ structures corresponding to the JSON messages.
+- Boost JSON is used for parsing and serializing JSON data.
+
+
 ### How to Contribute
 1. Fork the repository.
 2. Create a new branch for your feature (`git checkout -b feature/your-feature`).
