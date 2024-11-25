@@ -1,8 +1,6 @@
-# BreadcrumbsRobotControlCenterBackend
+# RobotControlCenterBackend
 
-**Breadcrumbs Robot Control Center Backend** is the backend of the **Robot Control Center** project. As the name suggests, this program facilitates the management of connections between the frontend, robots, and a database (MongoDB). It allows seamless communication between multiple frontends, robots, and provides essential data storage functionalities.
-
-![Robot Control Center Logo](https://example.com/logo.png) <!-- Add a project logo if available -->
+**Robot Control Center Backend** is the backend of the **Robot Control Center** project. As the name suggests, this program facilitates the management of connections between the frontend, robots, and a database (MongoDB). It allows seamless communication between multiple frontends, robots, and provides essential data storage functionalities.
 
 ## Table of Contents
 1. [Introduction](#introduction)
@@ -36,8 +34,8 @@ Before running the backend, ensure the following dependencies are installed:
 ### Steps
 1. **Clone the repository**:
     ```bash
-    git clone https://github.com/yourusername/BreadcrumbsRobotControlCenterBackend.git
-    cd BreadcrumbsRobotControlCenterBackend
+    git clone https://github.com/yourusername/RobotControlCenterBackend.git
+    cd RobotControlCenterBackend
     ```
 
 2. **Install dependencies**:
@@ -57,7 +55,7 @@ Before running the backend, ensure the following dependencies are installed:
 5. **Start the Backend**:
     Run the following command to start the backend:
     ```bash
-    ./robot_backend --db-ip <local_db_ip> --db-port <local_db_port> --network-db-ip <network_db_ip> --network-db-port <network_db_port> --db-password <db_password> --frontend-port <frontend_port> --robot-port <robot_port>
+    ./robot_backend <local_db_ip> <local_db_port> <network_db_ip> <network_db_port> <db_password> <frontend_port> <robot_port>
     ```
 
     Replace the placeholders with the appropriate values for your setup:
