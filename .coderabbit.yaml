@@ -1,0 +1,6 @@
+reviews:
+  auto_review:
+    enabled: true  # Włącz automatyczne recenzje
+    branches:
+      include:
+        - "*"  # Znak "*" oznacza, że automatyczne recenzje będą działać na wszystkich gałęziach
